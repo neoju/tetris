@@ -1,0 +1,14 @@
+* test_ghost_position_lands_at_bottom
+[1m9/9 passed.
+[0m[4m
+=== Full suite ===
+------
+Scripts               6
+Tests                66
+Passing Tests        66
+Asserts             156
+Time              0.421s
+
+
+[32m---- All tests passed! ----
+[0m

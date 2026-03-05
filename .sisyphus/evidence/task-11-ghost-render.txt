@@ -1,0 +1,1 @@
+Ghost piece rendering verified via game_board.tscn launch - no errors

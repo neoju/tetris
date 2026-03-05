@@ -1,0 +1,1 @@
+UI panel scene created. Launch test deferred to main.tscn integration (Task 15).
