@@ -18,7 +18,7 @@ const PERFECT_CLEAR_POINTS := {
 	1: 800,
 	2: 1200,
 	3: 1800,
-	4: 2000,
+	4: 3200,
 }
 
 var score: int = 0

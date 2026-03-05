@@ -63,7 +63,8 @@ func update(delta: float) -> Dictionary:
 		"level_up": false,
 		"moved": false,
 		"rotated": false,
-		"hard_dropped": false
+		"hard_dropped": false,
+		"soft_dropped": false
 	}
 
 	if active_piece == null:
@@ -124,6 +125,7 @@ func update(delta: float) -> Dictionary:
 			gravity_accumulator -= 1.0
 			if actions["soft_drop"]:
 				soft_drop_distance += 1
+				events["soft_dropped"] = true
 		else:
 			gravity_accumulator = 0.0
 			break

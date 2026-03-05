@@ -42,6 +42,8 @@ func _process(delta: float) -> void:
 			SfxManager.play("rotate")
 		if events.get("hard_dropped", false):
 			SfxManager.play("hard_drop")
+		if events.get("soft_dropped", false):
+			SfxManager.play("soft_drop")
 		if events.get("hold_swapped", false):
 			SfxManager.play("hold")
 		if events.get("piece_locked", false):
