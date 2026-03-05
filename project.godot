@@ -26,13 +26,13 @@ window/size/viewport_height=1040
 window/stretch/mode="viewport"
 window/handheld/orientation=1
 
-[gui]
-
-theme/custom="res://assets/fonts/game_theme.tres"
-
 [editor_plugins]
 
 enabled=PackedStringArray("res://addons/gut/plugin.cfg")
+
+[gui]
+
+theme/custom="res://assets/fonts/game_theme.tres"
 
 [input]
 

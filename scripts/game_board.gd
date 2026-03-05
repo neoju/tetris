@@ -12,8 +12,8 @@ const HardDropImpactScene = preload("res://scenes/particles/HardDropImpact.tscn"
 const AmbientSparklesScene = preload("res://scenes/particles/AmbientSparkles.tscn")
 
 # Fonts
-var _font: Font = preload("res://assets/fonts/monogram-extended.ttf")
-var _font_bold: Font = preload("res://assets/fonts/monogram-extended.ttf")
+var _font: Font
+var _font_bold: Font
 
 # Layout: board centered with side panels
 # Board = 10 cols × 24 rows = 320 × 768
@@ -46,6 +46,21 @@ func _ready() -> void:
 	for piece_type in type_to_color.keys():
 		textures[piece_type] = load("res://assets/blocks/block_" + type_to_color[piece_type] + ".png")
 	textures["ghost"] = load("res://assets/blocks/block_ghost.png")
+
+	# Initialize fonts with FontVariation for bold effect
+	var base_font = preload("res://assets/fonts/monogram-extended.ttf")
+	
+	# Regular font with moderate bold
+	var font_variation = FontVariation.new()
+	font_variation.base_font = base_font
+	font_variation.variation_embolden = 0.3
+	_font = font_variation
+	
+	# Bold font with heavier embolden
+	var font_bold_variation = FontVariation.new()
+	font_bold_variation.base_font = base_font
+	font_bold_variation.variation_embolden = 0.5
+	_font_bold = font_bold_variation
 
 	_original_position = position
 	_setup_ambient_sparkles()
@@ -512,20 +527,51 @@ func _spawn_floating_text(events: Dictionary) -> void:
 	elif is_b2b:
 		b2b_text = "BACK TO BACK"
 
-	var center_x = Constants.BOARD_OFFSET.x + (Constants.COLS * Constants.CELL_SIZE) / 2.0
-	# Spawn in the middle of the visible playfield (rows 4-23)
-	var playfield_top = Constants.BOARD_OFFSET.y + Constants.BUFFER_ROWS * Constants.CELL_SIZE
-	var spawn_y = playfield_top + Constants.VISIBLE_ROWS * Constants.CELL_SIZE * 0.4
+	# Extract position data from events
+	var locked_positions = events.get("locked_positions", [])
+	var cleared_rows = events.get("cleared_rows_data", [])
+
+	# Calculate spawn_x (horizontal center of locked piece)
+	var spawn_x: float
+	if locked_positions.size() > 0:
+		var min_col := 999
+		var max_col := -1
+		for pos in locked_positions:
+			if pos.x < min_col: min_col = pos.x
+			if pos.x > max_col: max_col = pos.x
+		spawn_x = Constants.BOARD_OFFSET.x + ((min_col + max_col) / 2.0 + 0.5) * Constants.CELL_SIZE
+	else:
+		spawn_x = Constants.BOARD_OFFSET.x + (Constants.COLS * Constants.CELL_SIZE) / 2.0
+
+	# Calculate spawn_y (topmost cleared row)
+	var spawn_y: float
+	if cleared_rows.size() > 0:
+		var top_row := 999
+		for row_info in cleared_rows:
+			var r: int = row_info["row"]
+			if r < top_row: top_row = r
+		spawn_y = Constants.BOARD_OFFSET.y + top_row * Constants.CELL_SIZE
+	else:
+		var playfield_top = Constants.BOARD_OFFSET.y + Constants.BUFFER_ROWS * Constants.CELL_SIZE
+		spawn_y = playfield_top + Constants.VISIBLE_ROWS * Constants.CELL_SIZE * 0.4
+
+	# Clamp position within playfield bounds
+	var board_left = Constants.BOARD_OFFSET.x + 40.0
+	var board_right = Constants.BOARD_OFFSET.x + Constants.COLS * Constants.CELL_SIZE - 40.0
+	spawn_x = clampf(spawn_x, board_left, board_right)
+	var vis_top = Constants.BOARD_OFFSET.y + Constants.BUFFER_ROWS * Constants.CELL_SIZE + 20.0
+	var vis_bottom = Constants.BOARD_OFFSET.y + Constants.TOTAL_ROWS * Constants.CELL_SIZE - 40.0
+	spawn_y = clampf(spawn_y, vis_top, vis_bottom)
 
 	_floating_texts.append({
 		"score_text": score_text,
 		"action_text": action_text,
 		"combo_text": combo_text,
 		"b2b_text": b2b_text,
-		"position": Vector2(center_x, spawn_y),
+		"position": Vector2(spawn_x, spawn_y),
 		"timer": 0.0,
 		"duration": Constants.FLOAT_DURATION,
-		"font_size": _score_to_font_size(score_added),
+		"font_size": _score_to_font_size(lines, combo),
 		"color": _get_score_color(lines, is_tspin, is_b2b, is_pc),
 		"combo_count": combo,
 	})
@@ -545,16 +591,33 @@ func _get_action_label(lines: int, is_tspin: bool, is_mini: bool) -> String:
 		4: return "TETRIS!"
 	return ""
 
-func _score_to_font_size(score: int) -> int:
-	if score <= 100:
-		return 18
-	elif score <= 300:
-		return 22
-	elif score <= 800:
-		return 26
-	elif score <= 1200:
-		return 30
-	return 34
+func _score_to_font_size(lines: int, combo: int) -> int:
+	var size := 32
+
+	# Add combo bonus
+	match combo:
+		1:
+			size += 6
+		2:
+			size += 10
+		3:
+			size += 16
+		_:
+			if combo >= 4:
+				size += 20
+
+	# Add clean-row bonus
+	match lines:
+		1:
+			size += 0
+		2:
+			size += 4
+		3:
+			size += 8
+		4:
+			size += 16
+
+	return size
 
 func _get_score_color(lines: int, is_tspin: bool, is_b2b: bool, is_pc: bool) -> Color:
 	if is_pc:
