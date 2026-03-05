@@ -1,0 +1,7 @@
+[gd_scene load_steps=2 format=3 uid="uid://lock_sparks"]
+
+[ext_resource type="Script" uid="uid://lock_sparks_gd" path="res://scenes/particles/LockSparks.gd" id="1"]
+
+[node name="LockSparks" type="CPUParticles2D"]
+script = ExtResource("1")
+amount = 6

@@ -1,0 +1,7 @@
+[gd_scene load_steps=2 format=3 uid="uid://hard_drop_impact"]
+
+[ext_resource type="Script" uid="uid://hard_drop_impact_gd" path="res://scenes/particles/HardDropImpact.gd" id="1"]
+
+[node name="HardDropImpact" type="CPUParticles2D"]
+script = ExtResource("1")
+amount = 20

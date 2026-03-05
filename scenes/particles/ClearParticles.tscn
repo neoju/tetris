@@ -1,0 +1,6 @@
+[gd_scene load_steps=2 format=3 uid="uid://clear_particles"]
+
+[ext_resource type="Script" uid="uid://clear_particles_gd" path="res://scenes/particles/ClearParticles.gd" id="1"]
+
+[node name="ClearParticles" type="CPUParticles2D"]
+script = ExtResource("1")
