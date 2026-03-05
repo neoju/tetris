@@ -62,6 +62,58 @@ func test_i_piece_rotates_all_4_states() -> void:
 	assert_eq(piece.rotation_state, 0, "I-piece should return to state 0 after 4 CW rotations")
 
 
+func test_s_piece_rotates_through_expected_cycle() -> void:
+	var piece = Piece.new("S", Vector2i(4, 10))
+	var expected_state_0: Array[Vector2i] = [Vector2i(3, 10), Vector2i(4, 10), Vector2i(4, 11), Vector2i(5, 11)]
+	var expected_state_1: Array[Vector2i] = [Vector2i(4, 9), Vector2i(4, 10), Vector2i(3, 10), Vector2i(3, 11)]
+	var expected_state_2: Array[Vector2i] = [Vector2i(5, 10), Vector2i(4, 10), Vector2i(4, 9), Vector2i(3, 9)]
+	var expected_state_3: Array[Vector2i] = [Vector2i(4, 11), Vector2i(4, 10), Vector2i(5, 10), Vector2i(5, 9)]
+
+	_assert_positions_match(piece.get_block_positions(), expected_state_0, "S state 0 should match expected shape")
+
+	assert_true(piece.try_rotate(_grid, true), "S-piece rotation to state 1 should succeed")
+	assert_eq(piece.rotation_state, 1, "S-piece rotation state should be 1")
+	_assert_positions_match(piece.get_block_positions(), expected_state_1, "S state 1 should match expected shape")
+
+	assert_true(piece.try_rotate(_grid, true), "S-piece rotation to state 2 should succeed")
+	assert_eq(piece.rotation_state, 2, "S-piece rotation state should be 2")
+	_assert_positions_match(piece.get_block_positions(), expected_state_2, "S state 2 should match expected shape")
+
+	assert_true(piece.try_rotate(_grid, true), "S-piece rotation to state 3 should succeed")
+	assert_eq(piece.rotation_state, 3, "S-piece rotation state should be 3")
+	_assert_positions_match(piece.get_block_positions(), expected_state_3, "S state 3 should match expected shape")
+
+	assert_true(piece.try_rotate(_grid, true), "S-piece fourth rotation should succeed")
+	assert_eq(piece.rotation_state, 0, "S-piece should return to state 0 after 4 CW rotations")
+	_assert_positions_match(piece.get_block_positions(), expected_state_0, "S-piece should return to original shape")
+
+
+func test_z_piece_rotates_through_expected_cycle() -> void:
+	var piece = Piece.new("Z", Vector2i(4, 10))
+	var expected_state_0: Array[Vector2i] = [Vector2i(4, 10), Vector2i(5, 10), Vector2i(3, 11), Vector2i(4, 11)]
+	var expected_state_1: Array[Vector2i] = [Vector2i(3, 9), Vector2i(3, 10), Vector2i(4, 10), Vector2i(4, 11)]
+	var expected_state_2: Array[Vector2i] = [Vector2i(5, 9), Vector2i(4, 9), Vector2i(4, 10), Vector2i(3, 10)]
+	var expected_state_3: Array[Vector2i] = [Vector2i(5, 11), Vector2i(5, 10), Vector2i(4, 10), Vector2i(4, 9)]
+
+	_assert_positions_match(piece.get_block_positions(), expected_state_0, "Z state 0 should match expected shape")
+
+	assert_true(piece.try_rotate(_grid, true), "Z-piece rotation to state 1 should succeed")
+	assert_eq(piece.rotation_state, 1, "Z-piece rotation state should be 1")
+	_assert_positions_match(piece.get_block_positions(), expected_state_1, "Z state 1 should match expected shape")
+
+	assert_true(piece.try_rotate(_grid, true), "Z-piece rotation to state 2 should succeed")
+	assert_eq(piece.rotation_state, 2, "Z-piece rotation state should be 2")
+	_assert_positions_match(piece.get_block_positions(), expected_state_2, "Z state 2 should match expected shape")
+
+	assert_true(piece.try_rotate(_grid, true), "Z-piece rotation to state 3 should succeed")
+	assert_eq(piece.rotation_state, 3, "Z-piece rotation state should be 3")
+	_assert_positions_match(piece.get_block_positions(), expected_state_3, "Z state 3 should match expected shape")
+
+	assert_true(piece.try_rotate(_grid, true), "Z-piece fourth rotation should succeed")
+	assert_eq(piece.rotation_state, 0, "Z-piece should return to state 0 after 4 CW rotations")
+	_assert_positions_match(piece.get_block_positions(), expected_state_0, "Z-piece should return to original shape")
+
+
 func test_o_piece_does_not_rotate() -> void:
 	var piece = Piece.new("O", Vector2i(4, 10))
 	var original_positions = piece.get_block_positions()

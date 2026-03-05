@@ -67,9 +67,9 @@ const SHAPES := {
 	# S-piece: 4 states (SRS standard - green)
 	"S": [
 		[Vector2i(-1, 0), Vector2i(0, 0), Vector2i(0, 1), Vector2i(1, 1)], # 0: S-shape
-		[Vector2i(0, -1), Vector2i(0, 0), Vector2i(1, 0), Vector2i(1, 1)], # 1
-		[Vector2i(0, 0), Vector2i(-1, 0), Vector2i(-1, -1), Vector2i(-2, -1)], # 2
-		[Vector2i(0, 0), Vector2i(0, -1), Vector2i(-1, -1), Vector2i(-1, 0)], # 3
+		[Vector2i(0, -1), Vector2i(0, 0), Vector2i(-1, 0), Vector2i(-1, 1)], # 1
+		[Vector2i(1, 0), Vector2i(0, 0), Vector2i(0, -1), Vector2i(-1, -1)], # 2
+		[Vector2i(0, 1), Vector2i(0, 0), Vector2i(1, 0), Vector2i(1, -1)], # 3
 	],
 	
 	# T-piece: 4 states
@@ -83,8 +83,8 @@ const SHAPES := {
 	# Z-piece: 4 states (SRS standard - red)
 	"Z": [
 		[Vector2i(0, 0), Vector2i(1, 0), Vector2i(-1, 1), Vector2i(0, 1)], # 0: Z-shape
-		[Vector2i(0, -1), Vector2i(0, 0), Vector2i(1, 0), Vector2i(1, 1)], # 1
-		[Vector2i(0, 0), Vector2i(1, 0), Vector2i(1, -1), Vector2i(2, -1)], # 2
-		[Vector2i(0, 0), Vector2i(0, -1), Vector2i(-1, 0), Vector2i(-1, -1)], # 3
+		[Vector2i(-1, -1), Vector2i(-1, 0), Vector2i(0, 0), Vector2i(0, 1)], # 1
+		[Vector2i(1, -1), Vector2i(0, -1), Vector2i(0, 0), Vector2i(-1, 0)], # 2
+		[Vector2i(1, 1), Vector2i(1, 0), Vector2i(0, 0), Vector2i(0, -1)], # 3
 	],
 }

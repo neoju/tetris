@@ -1,25 +1,25 @@
-[gd_scene load_steps=6 format=3]
+[gd_scene format=3 uid="uid://d3d7f276uni3l"]
 
-[ext_resource type="Script" path="res://scripts/game_manager.gd" id="1_manager"]
-[ext_resource type="PackedScene" path="res://scenes/game_board.tscn" id="2_board"]
+[ext_resource type="Script" uid="uid://dxypm4mxeq2nv" path="res://scripts/game_manager.gd" id="1_manager"]
+[ext_resource type="PackedScene" uid="uid://c27q8cl6l0acw" path="res://scenes/game_board.tscn" id="2_board"]
 [ext_resource type="PackedScene" path="res://scenes/ui_panel.tscn" id="3_ui"]
 [ext_resource type="PackedScene" path="res://scenes/menu.tscn" id="4_menu"]
 [ext_resource type="PackedScene" path="res://scenes/pause_overlay.tscn" id="5_pause"]
 [ext_resource type="PackedScene" path="res://scenes/game_over_overlay.tscn" id="6_gameover"]
 
-[node name="Main" type="Node"]
+[node name="Main" type="Node" unique_id=1481261664]
 script = ExtResource("1_manager")
 
-[node name="Menu" parent="." instance=ExtResource("4_menu")]
+[node name="Menu" parent="." unique_id=1650831006 instance=ExtResource("4_menu")]
 
-[node name="GameBoard" parent="." instance=ExtResource("2_board")]
+[node name="GameBoard" parent="." unique_id=1928686955 instance=ExtResource("2_board")]
 visible = false
 
-[node name="UIPanel" parent="." instance=ExtResource("3_ui")]
+[node name="UIPanel" parent="." unique_id=665200914 instance=ExtResource("3_ui")]
 visible = false
 
-[node name="PauseOverlay" parent="." instance=ExtResource("5_pause")]
+[node name="PauseOverlay" parent="." unique_id=1546555336 instance=ExtResource("5_pause")]
 visible = false
 
-[node name="GameOverOverlay" parent="." instance=ExtResource("6_gameover")]
+[node name="GameOverOverlay" parent="." unique_id=1576333213 instance=ExtResource("6_gameover")]
 visible = false
