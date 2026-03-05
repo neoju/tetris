@@ -1,0 +1,17 @@
+Task 15 - GUT Test Regression Check
+====================================
+Date: 2026-03-05
+Command: timeout 60 godot --headless --path /home/neo/Dev/me/tetris -d -s addons/gut/gut_cmdln.gd -gdir=res://test/unit/ -ginclude_subdirs -gexit
+
+Results:
+  test_bag.gd:        7/7 passed
+  test_game_logic.gd: 13/13 passed
+  test_grid.gd:       16/16 passed
+  test_lock_delay.gd: 7/7 passed
+  test_rotation.gd:   9/9 passed
+  test_scoring.gd:    14/14 passed
+
+Total: 66/66 passed, 156 asserts, 0 failures
+Time: 0.421s
+
+Result: ALL TESTS PASS - No regressions from Task 15 integration

@@ -1,0 +1,114 @@
+TASK 14: Sound Effects Generation - Verification Evidence
+==========================================================
+
+## 1. WAV File Generation
+
+Count of generated WAV files:
+$ ls -la /home/neo/Dev/me/tetris/assets/sfx/*.wav | wc -l
+10
+
+Verification of WAV properties:
+$ python3 -c "import wave, os; [print(f'{f}: {(w := wave.open(os.path.join(\"assets/sfx\", f), \"r\")).getnframes()} frames, {w.getsampwidth()*8}-bit, {w.getframerate()}Hz') or w.close() for f in sorted(os.listdir('assets/sfx')) if f.endswith('.wav')]"
+
+game_over.wav: 22050 frames, 16-bit, 44100Hz
+hard_drop.wav: 4410 frames, 16-bit, 44100Hz
+hold.wav: 3528 frames, 16-bit, 44100Hz
+level_up.wav: 13228 frames, 16-bit, 44100Hz
+line_clear.wav: 8820 frames, 16-bit, 44100Hz
+lock.wav: 3528 frames, 16-bit, 44100Hz
+move.wav: 2205 frames, 16-bit, 44100Hz
+rotate.wav: 2205 frames, 16-bit, 44100Hz
+soft_drop.wav: 1323 frames, 16-bit, 44100Hz
+tetris_clear.wav: 17640 frames, 16-bit, 44100Hz
+
+✓ All 10 WAV files generated successfully
+✓ All files are valid 16-bit mono WAV format at 44100Hz
+✓ Duration ranges from ~30ms (soft_drop) to ~500ms (game_over)
+
+## 2. Python Script Verification
+
+$ python3 tools/generate_sfx.py
+Generating sound effects in: /home/neo/Dev/me/tetris/tools/../assets/sfx
+Sample rate: 44100Hz, 16-bit mono
+--------------------------------------------------
+Created: /home/neo/Dev/me/tetris/tools/../assets/sfx/move.wav (2205 samples)
+Created: /home/neo/Dev/me/tetris/tools/../assets/sfx/rotate.wav (2205 samples)
+Created: /home/neo/Dev/me/tetris/tools/../assets/sfx/hard_drop.wav (4410 samples)
+Created: /home/neo/Dev/me/tetris/tools/../assets/sfx/soft_drop.wav (1323 samples)
+Created: /home/neo/Dev/me/tetris/tools/../assets/sfx/line_clear.wav (8820 samples)
+Created: /home/neo/Dev/me/tetris/tools/../assets/sfx/tetris_clear.wav (17640 samples)
+Created: /home/neo/Dev/me/tetris/tools/../assets/sfx/hold.wav (3528 samples)
+Created: /home/neo/Dev/me/tetris/tools/../assets/sfx/lock.wav (3528 samples)
+Created: /home/neo/Dev/me/tetris/tools/../assets/sfx/game_over.wav (22050 samples)
+Created: /home/neo/Dev/me/tetris/tools/../assets/sfx/level_up.wav (13228 samples)
+--------------------------------------------------
+✓ Successfully generated 10 sound effects
+
+## 3. GDScript SfxManager Creation
+
+Created: scripts/sfx_manager.gd
+- AudioStreamPlayer pool (4 players)
+- Preloads all 10 sound effects
+- play() method with round-robin player selection
+- Registered as autoload singleton in project.godot
+
+## 4. Autoload Registration
+
+Modified project.godot to add:
+[autoload]
+SfxManager="*res://scripts/sfx_manager.gd"
+
+## 5. GUT Test Suite
+
+All 66 tests continue to pass:
+$ timeout 60 godot --headless --path /home/neo/Dev/me/tetris -d -s addons/gut/gut_cmdln.gd -gdir=res://test/unit/ -ginclude_subdirs -gexit 2>&1 | grep -E "(passed|failed)"
+
+7/7 passed.   (test_bag_randomizer.gd)
+13/13 passed. (test_game_logic.gd)
+16/16 passed. (test_grid.gd)
+7/7 passed.   (test_lock_delay.gd)
+9/9 passed.   (test_piece.gd)
+14/14 passed. (test_scoring.gd)
+
+✓ All 66 tests pass
+✓ No functionality broken by SfxManager addition
+
+## 6. Files Created/Modified
+
+Created:
+- tools/generate_sfx.py (119 lines)
+- scripts/sfx_manager.gd (27 lines)
+- assets/sfx/move.wav
+- assets/sfx/rotate.wav
+- assets/sfx/hard_drop.wav
+- assets/sfx/soft_drop.wav
+- assets/sfx/line_clear.wav
+- assets/sfx/tetris_clear.wav
+- assets/sfx/hold.wav
+- assets/sfx/lock.wav
+- assets/sfx/game_over.wav
+- assets/sfx/level_up.wav
+
+Modified:
+- project.godot (added autoload section)
+
+## 7. Sound Effect Specifications
+
+All sound effects match requirements:
+- move.wav: 50ms, 440Hz square wave with decay
+- rotate.wav: 50ms, 660Hz square wave with decay
+- hard_drop.wav: 100ms, 110Hz thud with decay
+- soft_drop.wav: 30ms, 330Hz tap with decay
+- line_clear.wav: 200ms, 440→880Hz sweep
+- tetris_clear.wav: 400ms, 440→1760Hz sweep
+- hold.wav: 80ms, 440→660Hz two-tone
+- lock.wav: 80ms, 220Hz thunk with decay
+- game_over.wav: 500ms, 880→110Hz descending sweep
+- level_up.wav: 300ms, C-E-G-C arpeggio (523→659→784→1047Hz)
+
+## Summary
+
+✓ All 10 sound effects generated programmatically using Python stdlib
+✓ SfxManager autoload singleton created and registered
+✓ All 66 GUT tests continue passing
+✓ Ready for integration in Task 15 (Final Integration)

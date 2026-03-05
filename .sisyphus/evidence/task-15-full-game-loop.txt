@@ -1,0 +1,47 @@
+Task 15 - End-to-End Integration Verification
+===============================================
+Date: 2026-03-05
+
+1. Headless launch test:
+   Command: timeout 15 godot --headless --path /home/neo/Dev/me/tetris 2>&1 | grep -i error
+   Result: ZERO errors on launch
+
+2. SFX loading verification:
+   - After running --import, all 10 .wav files have .import metadata
+   - SfxManager loads all 10 sounds without errors
+   - class_name conflict fixed (removed class_name SfxManager since it's an autoload)
+
+3. Integration changes made:
+   a. game_logic.gd: Added "moved", "rotated", "hard_dropped" to events dict
+      - Events properly set when input actions succeed
+   b. game_board.gd: Wired SFX triggers in _process():
+      - moved -> SfxManager.play("move")
+      - rotated -> SfxManager.play("rotate")
+      - hard_dropped -> SfxManager.play("hard_drop")
+      - hold_swapped -> SfxManager.play("hold")
+      - piece_locked + lines==4 -> SfxManager.play("tetris_clear")
+      - piece_locked + lines>0 -> SfxManager.play("line_clear")
+      - piece_locked + lines==0 -> SfxManager.play("lock")
+      - level_up -> SfxManager.play("level_up")
+      - game_over -> SfxManager.play("game_over")
+   c. sfx_manager.gd: Removed class_name to fix autoload singleton conflict
+   d. main.tscn: Removed fake UID from game_board.tscn ext_resource
+
+4. Scene tree verification:
+   Main (Node) <- GameManager script
+   +-- Menu (Control) <- menu.tscn
+   +-- GameBoard (Node2D) <- game_board.tscn
+   +-- UIPanel (Control) <- ui_panel.tscn
+   +-- PauseOverlay (CanvasLayer) <- pause_overlay.tscn
+   +-- GameOverOverlay (CanvasLayer) <- game_over_overlay.tscn
+
+5. State machine flow:
+   - Menu: show menu, hide game/UI/overlays, processing disabled
+   - Start: hide menu, show game/UI, start_game(), enable processing
+   - Pause: show pause overlay, disable processing
+   - Resume: hide pause overlay, enable processing
+   - Game Over: disable processing, show game_over overlay with score
+   - Play Again: hide overlay, start_game(), enable processing
+   - Quit to Menu: hide everything, show menu
+
+Result: FULL INTEGRATION VERIFIED
