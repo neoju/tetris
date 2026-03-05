@@ -49,8 +49,12 @@ layout_mode = 2
 custom_minimum_size = Vector2(200, 50)
 layout_mode = 2
 text = "Resume"
+theme_override_font_sizes/font_size = 28
+theme_override_fonts/font = ExtResource("1_bold")
 
 [node name="QuitButton" type="Button" parent="Control/CenterContainer/VBoxContainer"]
 custom_minimum_size = Vector2(200, 50)
 layout_mode = 2
 text = "Quit to Menu"
+theme_override_font_sizes/font_size = 28
+theme_override_fonts/font = ExtResource("1_bold")

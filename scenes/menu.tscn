@@ -1,8 +1,8 @@
-[gd_scene format=3]
+[gd_scene format=3 uid="uid://blnt2wri44n1j"]
 
-[ext_resource type="FontFile" path="res://assets/fonts/monogram-extended.ttf" id="1_bold"]
+[ext_resource type="FontFile" uid="uid://bxswyuvv0hqub" path="res://assets/fonts/monogram-extended.ttf" id="1_bold"]
 
-[node name="Menu" type="Control"]
+[node name="Menu" type="Control" unique_id=1570330956]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -10,7 +10,7 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="Background" type="ColorRect" parent="."]
+[node name="Background" type="ColorRect" parent="." unique_id=504741558]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -19,7 +19,7 @@ grow_horizontal = 2
 grow_vertical = 2
 color = Color(0.1, 0.1, 0.15, 1)
 
-[node name="CenterContainer" type="CenterContainer" parent="."]
+[node name="CenterContainer" type="CenterContainer" parent="." unique_id=173267829]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -27,22 +27,24 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="VBoxContainer" type="VBoxContainer" parent="CenterContainer"]
+[node name="VBoxContainer" type="VBoxContainer" parent="CenterContainer" unique_id=1494303973]
 layout_mode = 2
 
-[node name="TitleLabel" type="Label" parent="CenterContainer/VBoxContainer"]
+[node name="TitleLabel" type="Label" parent="CenterContainer/VBoxContainer" unique_id=858225926]
 layout_mode = 2
-theme_override_fonts/font = ExtResource("1_bold")
 theme_override_colors/font_color = Color(1, 1, 1, 1)
-theme_override_font_sizes/font_size = 50
+theme_override_fonts/font = ExtResource("1_bold")
+theme_override_font_sizes/font_size = 54
 text = "TETRIS"
 horizontal_alignment = 1
 
-[node name="Spacer" type="Control" parent="CenterContainer/VBoxContainer"]
+[node name="Spacer" type="Control" parent="CenterContainer/VBoxContainer" unique_id=764208615]
 custom_minimum_size = Vector2(0, 40)
 layout_mode = 2
 
-[node name="StartButton" type="Button" parent="CenterContainer/VBoxContainer"]
+[node name="StartButton" type="Button" parent="CenterContainer/VBoxContainer" unique_id=1803818290]
 custom_minimum_size = Vector2(200, 50)
 layout_mode = 2
+theme_override_font_sizes/font_size = 28
+theme_override_fonts/font = ExtResource("1_bold")
 text = "Start Game"
