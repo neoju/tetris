@@ -12,6 +12,9 @@ import os
 # Audio settings
 SAMPLE_RATE = 44100
 MAX_AMPLITUDE = 32767
+MASTER_GAIN = 0.32
+WARM_PITCH_FACTOR = 0.96
+WARM_LOWPASS_HZ = 3200.0
 
 # Output directory
 OUTPUT_DIR = os.path.join(os.path.dirname(__file__), "..", "assets", "sfx")
@@ -23,18 +26,12 @@ def generate_tone(freq, duration_ms, waveform="square", decay=True):
     samples = []
     for i in range(num_samples):
         t = i / SAMPLE_RATE
-        if waveform == "square":
-            value = (
-                MAX_AMPLITUDE
-                if math.sin(2 * math.pi * freq * t) >= 0
-                else -MAX_AMPLITUDE
-            )
-        elif waveform == "sine":
-            value = int(MAX_AMPLITUDE * math.sin(2 * math.pi * freq * t))
+        value = _osc_sample(freq, t, waveform)
         if decay:
             value = int(value * (1.0 - i / num_samples))  # linear decay
+        value = int(value * MASTER_GAIN)
         samples.append(value)
-    return samples
+    return _apply_lowpass(samples, WARM_LOWPASS_HZ)
 
 
 def generate_sweep(start_freq, end_freq, duration_ms, waveform="square"):
@@ -45,17 +42,41 @@ def generate_sweep(start_freq, end_freq, duration_ms, waveform="square"):
         t = i / num_samples  # 0.0 to 1.0
         freq = start_freq + (end_freq - start_freq) * t
         time = i / SAMPLE_RATE
-        if waveform == "square":
-            value = (
-                MAX_AMPLITUDE
-                if math.sin(2 * math.pi * freq * time) >= 0
-                else -MAX_AMPLITUDE
-            )
-        else:
-            value = int(MAX_AMPLITUDE * math.sin(2 * math.pi * freq * time))
+        value = _osc_sample(freq, time, waveform)
         value = int(value * (1.0 - t * 0.3))  # slight decay
+        value = int(value * MASTER_GAIN)
         samples.append(value)
-    return samples
+    return _apply_lowpass(samples, WARM_LOWPASS_HZ)
+
+
+def _osc_sample(freq, t, waveform):
+    tuned_freq = freq * WARM_PITCH_FACTOR
+    omega = 2 * math.pi * tuned_freq * t
+    if waveform == "square":
+        v1 = math.sin(omega)
+        v3 = 0.24 * math.sin(omega * 3.0)
+        v5 = 0.12 * math.sin(omega * 5.0)
+        v7 = 0.06 * math.sin(omega * 7.0)
+        value = (v1 + v3 + v5 + v7) / 1.42
+        return int(MAX_AMPLITUDE * value)
+    if waveform == "sine":
+        return int(MAX_AMPLITUDE * math.sin(omega))
+    return 0
+
+
+def _apply_lowpass(samples, cutoff_hz):
+    if not samples:
+        return samples
+    rc = 1.0 / (2.0 * math.pi * cutoff_hz)
+    dt = 1.0 / SAMPLE_RATE
+    alpha = dt / (rc + dt)
+    filtered = []
+    y = float(samples[0])
+    filtered.append(int(y))
+    for x in samples[1:]:
+        y += alpha * (x - y)
+        filtered.append(int(y))
+    return filtered
 
 
 def generate_arpeggio(freqs, note_duration_ms):
