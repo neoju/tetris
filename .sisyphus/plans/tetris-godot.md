@@ -628,7 +628,7 @@ Max Concurrent: 3 (Waves 2, 3)
 
 ---
 
-- [ ] 5. SRS Rotation System with Wall Kicks
+- [x] 5. SRS Rotation System with Wall Kicks
 
   **What to do**:
   - Create `scripts/piece.gd` as `class_name Piece extends RefCounted`:
@@ -732,7 +732,7 @@ Max Concurrent: 3 (Waves 2, 3)
 
 ---
 
-- [ ] 6. Scoring System & T-Spin Detection
+- [x] 6. Scoring System & T-Spin Detection
 
   **What to do**:
   - Create `scripts/scoring.gd` as `class_name Scoring extends RefCounted`:
@@ -834,7 +834,7 @@ Max Concurrent: 3 (Waves 2, 3)
 
 ---
 
-- [ ] 7. Lock Delay & DAS/ARR Input Handling
+- [x] 7. Lock Delay & DAS/ARR Input Handling
 
   **What to do**:
   - Create `scripts/input_handler.gd` as `class_name InputHandler extends RefCounted`:
@@ -926,7 +926,7 @@ Max Concurrent: 3 (Waves 2, 3)
 
 ---
 
-- [ ] 8. Game Logic Orchestrator — Gravity, Hold, Piece Lifecycle
+- [x] 8. Game Logic Orchestrator — Gravity, Hold, Piece Lifecycle
 
   **What to do**:
   - Create `scripts/game_logic.gd` as `class_name GameLogic extends RefCounted`:
@@ -1049,7 +1049,7 @@ Max Concurrent: 3 (Waves 2, 3)
 
 ---
 
-- [ ] 9. GUT Test Suite for Integrated Mechanics
+- [x] 9. GUT Test Suite for Integrated Mechanics
 
   **What to do**:
   - Create `test/unit/test_game_logic.gd` extending `GutTest` — integration tests for GameLogic:
