@@ -2,24 +2,58 @@
 
 [ext_resource type="Script" uid="uid://dxypm4mxeq2nv" path="res://scripts/game_manager.gd" id="1_manager"]
 [ext_resource type="PackedScene" uid="uid://c27q8cl6l0acw" path="res://scenes/game_board.tscn" id="2_board"]
-[ext_resource type="PackedScene" path="res://scenes/ui_panel.tscn" id="3_ui"]
+[ext_resource type="PackedScene" uid="uid://34dap23k4cd3" path="res://scenes/ui_panel.tscn" id="3_ui"]
 [ext_resource type="PackedScene" path="res://scenes/menu.tscn" id="4_menu"]
 [ext_resource type="PackedScene" path="res://scenes/pause_overlay.tscn" id="5_pause"]
 [ext_resource type="PackedScene" path="res://scenes/game_over_overlay.tscn" id="6_gameover"]
+[ext_resource type="Shader" uid="uid://htrju2c8c841" path="res://assets/shaders/background.gdshader" id="7_bg_shader"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_bg"]
+shader = ExtResource("7_bg_shader")
+shader_parameter/color_top = Color(0.05, 0.02, 0.12, 1)
+shader_parameter/color_mid = Color(0.12, 0.04, 0.22, 1)
+shader_parameter/color_bottom = Color(0.08, 0.06, 0.18, 1)
+shader_parameter/color_accent = Color(0.25, 0.05, 0.35, 1)
+shader_parameter/time_scale = 0.03
+shader_parameter/noise_strength = 0.08
+
+[sub_resource type="CanvasItemMaterial" id="CanvasItemMaterial_cg"]
+blend_mode = 3
 
 [node name="Main" type="Node" unique_id=1481261664]
 script = ExtResource("1_manager")
 
+[node name="Background" type="ColorRect" parent="." unique_id=940960295]
+material = SubResource("ShaderMaterial_bg")
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
 [node name="Menu" parent="." unique_id=1650831006 instance=ExtResource("4_menu")]
+visible = false
 
 [node name="GameBoard" parent="." unique_id=1928686955 instance=ExtResource("2_board")]
-visible = false
 
 [node name="UIPanel" parent="." unique_id=665200914 instance=ExtResource("3_ui")]
-visible = false
 
 [node name="PauseOverlay" parent="." unique_id=1546555336 instance=ExtResource("5_pause")]
 visible = false
 
 [node name="GameOverOverlay" parent="." unique_id=1576333213 instance=ExtResource("6_gameover")]
 visible = false
+
+[node name="ColorGrading" type="CanvasLayer" parent="." unique_id=1158274193]
+layer = 100
+
+[node name="Overlay" type="ColorRect" parent="ColorGrading" unique_id=1178501219]
+material = SubResource("CanvasItemMaterial_cg")
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0.97, 0.95, 1, 1)
