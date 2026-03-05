@@ -83,6 +83,36 @@ func clear_full_lines() -> int:
 	
 	return lines_cleared
 
+
+# Find all rows that are completely full (without clearing them)
+# Returns row indices in bottom-to-top order
+func find_full_lines() -> Array[int]:
+	var full_rows: Array[int] = []
+	for row in range(HEIGHT - 1, -1, -1):
+		if _is_line_full(row):
+			full_rows.append(row)
+	return full_rows
+
+
+# Get a copy of a row's cell data
+func get_row_data(row: int) -> Array:
+	var data: Array = []
+	for col in range(WIDTH):
+		data.append(cells[row][col])
+	return data
+
+
+# Check if clearing the given full rows would result in a perfect clear
+func would_be_perfect_clear(full_rows: Array[int]) -> bool:
+	for row in range(HEIGHT):
+		if row in full_rows:
+			continue
+		for col in range(WIDTH):
+			if cells[row][col] != "":
+				return false
+	return true
+
+
 # Check if a specific row is completely filled
 func _is_line_full(row: int) -> bool:
 	for col in range(WIDTH):

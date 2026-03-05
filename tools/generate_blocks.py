@@ -77,9 +77,8 @@ def create_ghost_block(output_path):
     img = Image.new("RGBA", (BLOCK_SIZE, BLOCK_SIZE), (0, 0, 0, 0))
     draw = ImageDraw.Draw(img)
 
-    # White with 30% opacity (alpha = 77 out of 255)
-    ghost_color = (255, 255, 255, 77)
-    outline_color = (255, 255, 255, 128)
+    ghost_color = (255, 255, 255, 38)
+    outline_color = (255, 255, 255, 77)
 
     # Draw filled rectangle with transparency
     draw.rectangle([1, 1, BLOCK_SIZE - 2, BLOCK_SIZE - 2], fill=ghost_color)

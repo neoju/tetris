@@ -22,7 +22,7 @@ SfxManager="*res://scripts/sfx_manager.gd"
 [display]
 
 window/size/viewport_width=480
-window/size/viewport_height=640
+window/size/viewport_height=1040
 window/stretch/mode="viewport"
 window/handheld/orientation=1
 
