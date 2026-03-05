@@ -1,0 +1,25 @@
+[gd_scene load_steps=6 format=3]
+
+[ext_resource type="Script" path="res://scripts/game_manager.gd" id="1_manager"]
+[ext_resource type="PackedScene" path="res://scenes/game_board.tscn" id="2_board"]
+[ext_resource type="PackedScene" path="res://scenes/ui_panel.tscn" id="3_ui"]
+[ext_resource type="PackedScene" path="res://scenes/menu.tscn" id="4_menu"]
+[ext_resource type="PackedScene" path="res://scenes/pause_overlay.tscn" id="5_pause"]
+[ext_resource type="PackedScene" path="res://scenes/game_over_overlay.tscn" id="6_gameover"]
+
+[node name="Main" type="Node"]
+script = ExtResource("1_manager")
+
+[node name="Menu" parent="." instance=ExtResource("4_menu")]
+
+[node name="GameBoard" parent="." instance=ExtResource("2_board")]
+visible = false
+
+[node name="UIPanel" parent="." instance=ExtResource("3_ui")]
+visible = false
+
+[node name="PauseOverlay" parent="." instance=ExtResource("5_pause")]
+visible = false
+
+[node name="GameOverOverlay" parent="." instance=ExtResource("6_gameover")]
+visible = false
