@@ -60,7 +60,10 @@ func update(delta: float) -> Dictionary:
 		"game_over": false,
 		"piece_locked": false,
 		"hold_swapped": false,
-		"level_up": false
+		"level_up": false,
+		"moved": false,
+		"rotated": false,
+		"hard_dropped": false
 	}
 
 	if active_piece == null:
@@ -80,23 +83,30 @@ func update(delta: float) -> Dictionary:
 
 	if actions["rotate_cw"]:
 		var was_on_surface_before_rotate := _is_on_surface()
-		if active_piece.try_rotate(grid, true) and was_on_surface_before_rotate:
-			lock_delay.reset_on_move()
+		if active_piece.try_rotate(grid, true):
+			events["rotated"] = true
+			if was_on_surface_before_rotate:
+				lock_delay.reset_on_move()
 
 	if actions["rotate_ccw"]:
 		var was_on_surface_before_rotate_ccw := _is_on_surface()
-		if active_piece.try_rotate(grid, false) and was_on_surface_before_rotate_ccw:
-			lock_delay.reset_on_move()
+		if active_piece.try_rotate(grid, false):
+			events["rotated"] = true
+			if was_on_surface_before_rotate_ccw:
+				lock_delay.reset_on_move()
 
 	if actions["move"] != Vector2i.ZERO:
 		var was_on_surface_before_move := _is_on_surface()
-		if active_piece.try_move(grid, actions["move"]) and was_on_surface_before_move:
-			lock_delay.reset_on_move()
+		if active_piece.try_move(grid, actions["move"]):
+			events["moved"] = true
+			if was_on_surface_before_move:
+				lock_delay.reset_on_move()
 
 	if actions["hard_drop"]:
 		var hard_drop_result := hard_drop()
 		_lock_hard_drop_distance = hard_drop_result["distance"]
 		_lock_was_hard_drop = true
+		events["hard_dropped"] = true
 		var lock_events := _lock_piece()
 		for key in lock_events.keys():
 			events[key] = lock_events[key]

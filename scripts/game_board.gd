@@ -11,6 +11,7 @@ const BUFFER_ROWS = GridScript.BUFFER_ROWS
 
 var game_logic: GameLogicScript
 var textures: Dictionary = {}
+var game_manager = null
 
 func _ready() -> void:
 	# Map piece types to color names (assets are named by color)
@@ -32,7 +33,31 @@ func _ready() -> void:
 
 func _process(delta: float) -> void:
 	if game_logic != null:
-		var _events = game_logic.update(delta)
+		var events = game_logic.update(delta)
+
+		# SFX triggers based on events
+		if events.get("moved", false):
+			SfxManager.play("move")
+		if events.get("rotated", false):
+			SfxManager.play("rotate")
+		if events.get("hard_dropped", false):
+			SfxManager.play("hard_drop")
+		if events.get("hold_swapped", false):
+			SfxManager.play("hold")
+		if events.get("piece_locked", false):
+			if events.get("lines_cleared", 0) == 4:
+				SfxManager.play("tetris_clear")
+			elif events.get("lines_cleared", 0) > 0:
+				SfxManager.play("line_clear")
+			else:
+				SfxManager.play("lock")
+		if events.get("level_up", false):
+			SfxManager.play("level_up")
+		if events.get("game_over", false):
+			SfxManager.play("game_over")
+			if game_manager != null:
+				game_manager.on_game_over(game_logic.scoring.score)
+
 		queue_redraw()
 
 func grid_to_screen(grid_pos: Vector2i) -> Vector2:
