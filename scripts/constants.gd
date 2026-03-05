@@ -41,9 +41,9 @@ const CLEAR_TOTAL_DURATION: float = CLEAR_FLASH_DURATION + CLEAR_DISSOLVE_DURATI
 # =============================================================================
 # VFX TIMING
 # =============================================================================
-const SHAKE_DECAY: float = 8.0                # How fast shake dies (higher = faster)
+const SHAKE_DECAY: float = 10.0               # How fast shake dies (higher = faster)
 const BORDER_GLOW_DECAY: float = 3.0          # How fast border glow fades
-const HARD_DROP_CELLS_PER_SECOND: float = 150.0
+const HARD_DROP_CELLS_PER_SECOND: float = 125.0
 
 # =============================================================================
 # INPUT SETTINGS
@@ -61,3 +61,4 @@ const MAX_MOVES: int = 15
 # AUDIO
 # =============================================================================
 const SFX_POOL_SIZE: int = 4
+const SFX_VOLUME_DB: float = -7.0

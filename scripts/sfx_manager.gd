@@ -7,6 +7,7 @@ var _next_player: int = 0
 func _ready() -> void:
 	for i in range(Constants.SFX_POOL_SIZE):
 		var player = AudioStreamPlayer.new()
+		player.volume_db = Constants.SFX_VOLUME_DB
 		add_child(player)
 		_players.append(player)
 	

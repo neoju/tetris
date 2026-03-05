@@ -11,6 +11,10 @@ const LockSparksScene = preload("res://scenes/particles/LockSparks.tscn")
 const HardDropImpactScene = preload("res://scenes/particles/HardDropImpact.tscn")
 const AmbientSparklesScene = preload("res://scenes/particles/AmbientSparkles.tscn")
 
+# Fonts
+var _font: Font = preload("res://assets/fonts/monogram-extended.ttf")
+var _font_bold: Font = preload("res://assets/fonts/monogram-extended.ttf")
+
 # Layout: board centered with side panels
 # Board = 10 cols × 24 rows = 320 × 768
 # Viewport = 480 × 1040
@@ -79,7 +83,7 @@ func _process(delta: float) -> void:
 			
 		if events.has("hard_drop_impact"):
 			var distance: int = events["hard_drop_impact"].get("distance", 0)
-			var impact_shake = clampf(1.0 + (float(distance) / 1.0), 1.0, 5.0)
+			var impact_shake = clampf(0.6 + (float(distance) / 2.5), 0.6, 3.0)
 			if _shake_intensity < impact_shake:
 				_shake_intensity = impact_shake
 				_shake_timer = 0.0
@@ -223,15 +227,15 @@ func _trigger_shake(events: Dictionary) -> void:
 	var is_pc = events.get("is_perfect_clear", false)
 
 	if is_pc:
-		_shake_intensity = 12.0
+		_shake_intensity = 6.0
 	elif lines == 4 or is_tspin:
-		_shake_intensity = 8.0
+		_shake_intensity = 4.5
 	elif lines == 3:
-		_shake_intensity = 5.0
+		_shake_intensity = 3.0
 	elif lines == 2:
-		_shake_intensity = 3.5
-	else:
 		_shake_intensity = 2.0
+	else:
+		_shake_intensity = 1.2
 
 	_shake_timer = 0.0
 
@@ -543,14 +547,14 @@ func _get_action_label(lines: int, is_tspin: bool, is_mini: bool) -> String:
 
 func _score_to_font_size(score: int) -> int:
 	if score <= 100:
-		return 16
+		return 18
 	elif score <= 300:
-		return 20
+		return 22
 	elif score <= 800:
-		return 24
+		return 26
 	elif score <= 1200:
-		return 28
-	return 32
+		return 30
+	return 34
 
 func _get_score_color(lines: int, is_tspin: bool, is_b2b: bool, is_pc: bool) -> Color:
 	if is_pc:
@@ -573,7 +577,6 @@ func _get_combo_color(combo: int) -> Color:
 	return Color(1.0, 1.0, 0.3)
 
 func _draw_floating_texts() -> void:
-	var font = ThemeDB.fallback_font
 	for ft in _floating_texts:
 		var t = ft["timer"] / ft["duration"]
 		var hold_end = Constants.FLOAT_HOLD_RATIO
@@ -597,16 +600,16 @@ func _draw_floating_texts() -> void:
 		if ft["b2b_text"] != "":
 			var b2b_color = Color(1.0, 0.85, 0.0, alpha)
 			var b2b_size = maxi(scaled_size - 6, 10)
-			draw_string(font, Vector2(pos.x - 100, y_cursor), ft["b2b_text"],
+			draw_string(_font_bold, Vector2(pos.x - 100, y_cursor), ft["b2b_text"],
 				HORIZONTAL_ALIGNMENT_CENTER, 200, b2b_size, b2b_color)
 			y_cursor += b2b_size + line_gap
 
 		var action_size = maxi(scaled_size - 2, 12)
-		draw_string(font, Vector2(pos.x - 100, y_cursor), ft["action_text"],
+		draw_string(_font_bold, Vector2(pos.x - 100, y_cursor), ft["action_text"],
 			HORIZONTAL_ALIGNMENT_CENTER, 200, action_size, color)
 		y_cursor += action_size + line_gap
 
-		draw_string(font, Vector2(pos.x - 100, y_cursor), ft["score_text"],
+		draw_string(_font, Vector2(pos.x - 100, y_cursor), ft["score_text"],
 			HORIZONTAL_ALIGNMENT_CENTER, 200, scaled_size, color)
 		y_cursor += scaled_size + line_gap
 
@@ -614,7 +617,7 @@ func _draw_floating_texts() -> void:
 			var combo_color = _get_combo_color(ft["combo_count"])
 			combo_color.a = alpha
 			var combo_size = maxi(scaled_size - 4, 10)
-			draw_string(font, Vector2(pos.x - 100, y_cursor), ft["combo_text"],
+			draw_string(_font_bold, Vector2(pos.x - 100, y_cursor), ft["combo_text"],
 				HORIZONTAL_ALIGNMENT_CENTER, 200, combo_size, combo_color)
 
 
