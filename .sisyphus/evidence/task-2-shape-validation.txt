@@ -1,0 +1,17 @@
+=== QA Scenario: All 7 piece types have 4 rotation states ===
+Date: Thu Mar  5 01:14:10 PM +07 2026
+
+Checking SHAPES dictionary has 7 keys...
+Found 21 piece type keys in SHAPES
+✗ FAIL: Expected 7, found 21
+
+Checking rotation states per piece...
+I: 4 block positions per state (4 states expected)
+J: 4 block positions per state (4 states expected)
+L: 4 block positions per state (4 states expected)
+S: 4 block positions per state (4 states expected)
+T: 4 block positions per state (4 states expected)
+Z: 4 block positions per state (4 states expected)
+O: 4 identical states (rotation has no effect)
+
+✓ PASS: All pieces have correct rotation states

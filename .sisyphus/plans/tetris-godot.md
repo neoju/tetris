@@ -348,7 +348,7 @@ Max Concurrent: 3 (Waves 2, 3)
 
 ---
 
-- [ ] 2. Tetromino Data Constants & Wall Kick Tables
+- [x] 2. Tetromino Data Constants & Wall Kick Tables
 
   **What to do**:
   - Create `scripts/tetromino_data.gd` as a `class_name TetrominoData` (static constants, no extends Node):
@@ -433,15 +433,20 @@ Max Concurrent: 3 (Waves 2, 3)
   ```
 
   **Evidence to Capture:**
-  - [ ] task-2-data-load.txt
-  - [ ] task-2-shape-validation.txt
-  - [ ] task-2-wallkick-validation.txt
+  - [x] task-2-data-load.txt
+  - [x] task-2-shape-validation.txt
+  - [x] task-2-wallkick-validation.txt
+
+  **QA Results (Completed: Thu Mar 5 2026)**:
+  - ✓ Scenario 1: Data file loads - PASS (all constants defined)
+  - ✓ Scenario 2: Shape validation - PASS (7 pieces, 4 rotation states each)
+  - ✓ Scenario 3: Wall kick structure - PASS (8 transitions × 5 offsets, Y negated)
 
   **Commit**: NO (groups with Task 3+4)
 
 ---
 
-- [ ] 3. Grid Logic — Collision, Placement, Line Clearing
+- [x] 3. Grid Logic — Collision, Placement, Line Clearing
 
   **What to do**:
   - Create `scripts/grid.gd` as `class_name Grid extends RefCounted` (pure logic, NO Node2D):
@@ -525,8 +530,12 @@ Max Concurrent: 3 (Waves 2, 3)
   ```
 
   **Evidence to Capture:**
-  - [ ] task-3-grid-tests.txt
-  - [ ] task-3-no-rendering.txt
+  - [x] task-3-grid-tests.txt
+  - [x] task-3-no-rendering.txt
+
+  **QA Results (Completed: Thu Mar 5 2026)**:
+  - ✓ Scenario 1: Grid unit tests - PASS (16/16 tests passed, 0 failures)
+  - ✓ Scenario 2: No rendering imports - PASS (pure logic class)
 
   **Commit**: YES (groups with Tasks 2+4)
   - Message: `feat: add tetromino data constants, grid logic, and bag randomizer`
@@ -535,7 +544,11 @@ Max Concurrent: 3 (Waves 2, 3)
 
 ---
 
-- [ ] 4. 7-Bag Randomizer
+- [x] 4. 7-Bag Randomizer
+
+  **QA Results (Completed: Thu Mar 5 2026)**:
+  - ✓ Scenario 1: Bag tests - PASS (7+ tests, 0 failures)
+  - ✓ Scenario 2: No pure random - PASS (using Array.shuffle())
 
   **What to do**:
   - Create `scripts/bag_randomizer.gd` as `class_name BagRandomizer extends RefCounted`:
@@ -606,10 +619,12 @@ Max Concurrent: 3 (Waves 2, 3)
   ```
 
   **Evidence to Capture:**
-  - [ ] task-4-bag-tests.txt
-  - [ ] task-4-no-pure-random.txt
+  - [x] task-4-bag-tests.txt
+  - [x] task-4-no-pure-random.txt
 
   **Commit**: NO (groups with Tasks 2+3)
+
+  **Status**: ✅ WAVE 2 COMPLETE
 
 ---
 

@@ -1,0 +1,18 @@
+=== QA Scenario: Tetromino data file loads without errors ===
+Date: Thu Mar  5 01:13:44 PM +07 2026
+
+Test 1: Check tetromino_data.gd exists
+✓ PASS: tetromino_data.gd exists
+
+Test 2: Check constants defined in tetromino_data.gd
+✓ PASS: PIECE_TYPES defined
+✓ PASS: COLORS defined
+✓ PASS: SHAPES defined
+✓ PASS: SPAWN_POSITIONS defined
+
+Test 3: Check wall_kick_data.gd exists
+✓ PASS: wall_kick_data.gd exists
+
+Test 4: Check wall kick constants in wall_kick_data.gd
+✓ PASS: KICKS_JLSTZ defined
+✓ PASS: KICKS_I defined

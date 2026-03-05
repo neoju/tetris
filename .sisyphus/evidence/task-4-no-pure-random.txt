@@ -1,0 +1,10 @@
+=== QA Scenario: No pure random usage ===
+Date: Thu Mar  5 01:27:13 PM +07 2026
+
+Searching for pure random calls (pick_random, randi, randf) in bag_randomizer.gd:
+No pure random calls found.
+
+✓ PASS: Using Array.shuffle() for randomization (as required by plan)
+
+Verified that shuffle() is used:
+29:	_next_bag.shuffle()
