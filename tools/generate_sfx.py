@@ -116,6 +116,20 @@ def main():
             "level_up.wav",
             lambda: generate_arpeggio([523, 659, 784, 1047], 75),
         ),  # C-E-G-C
+        # Combo SFX - escalating arpeggios
+        ("combo_1.wav", lambda: generate_arpeggio([523, 659], 40)),  # C-E (2 notes)
+        (
+            "combo_2.wav",
+            lambda: generate_arpeggio([587, 740, 880], 35),
+        ),  # D-F#-A (3 notes)
+        (
+            "combo_3.wav",
+            lambda: generate_arpeggio([659, 831, 988, 1175], 30),
+        ),  # E-G#-B-D (4 notes)
+        (
+            "combo_high.wav",
+            lambda: generate_arpeggio([784, 988, 1175, 1397, 1568], 25),
+        ),  # G-B-D-E-G (5 notes)
     ]
 
     for filename, generator in sfx_definitions:

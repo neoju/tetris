@@ -57,6 +57,7 @@ func _on_start_game() -> void:
 	
 	ui_panel.game_logic = game_board.game_logic
 	game_board.game_logic.start_game()
+	game_board.clear_floating_texts()
 	game_board.set_process(true)
 	ui_panel.set_process(true)
 
@@ -87,6 +88,7 @@ func _play_again() -> void:
 	current_state = State.PLAYING
 	game_over_overlay.hide()
 	game_board.game_logic.start_game()
+	game_board.clear_floating_texts()
 	game_board.set_process(true)
 	ui_panel.set_process(true)
 

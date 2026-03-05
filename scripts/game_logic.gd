@@ -229,7 +229,12 @@ func _lock_piece() -> Dictionary:
 		"lines_cleared": 0,
 		"score_added": 0,
 		"piece_locked": false,
-		"level_up": false
+		"level_up": false,
+		"combo_count": -1,
+		"is_tspin": false,
+		"is_tspin_mini": false,
+		"is_back_to_back": false,
+		"is_perfect_clear": false
 	}
 
 	if active_piece == null:
@@ -237,6 +242,7 @@ func _lock_piece() -> Dictionary:
 
 	var level_before := scoring.level
 	var score_before := scoring.score
+	var b2b_before := scoring.back_to_back
 
 	grid.place_blocks(active_piece.get_block_positions(), active_piece.type)
 	var tspin := scoring.detect_tspin(
@@ -263,6 +269,11 @@ func _lock_piece() -> Dictionary:
 	events["score_added"] = scoring.score - score_before
 	events["piece_locked"] = true
 	events["level_up"] = scoring.level > level_before
+	events["combo_count"] = scoring.combo_count
+	events["is_tspin"] = tspin["is_tspin"]
+	events["is_tspin_mini"] = tspin["is_mini"]
+	events["is_back_to_back"] = b2b_before and lines > 0 and (lines == 4 or tspin["is_tspin"])
+	events["is_perfect_clear"] = perfect_clear and lines > 0
 
 	soft_drop_distance = 0
 	gravity_accumulator = 0.0

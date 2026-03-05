@@ -12,7 +12,8 @@ func _ready() -> void:
 		_players.append(player)
 	
 	var sfx_names = ["move", "rotate", "hard_drop", "soft_drop", "line_clear", 
-	                 "tetris_clear", "hold", "lock", "game_over", "level_up"]
+	                 "tetris_clear", "hold", "lock", "game_over", "level_up",
+	                 "combo_1", "combo_2", "combo_3", "combo_high"]
 	for sfx_name in sfx_names:
 		var path = "res://assets/sfx/" + sfx_name + ".wav"
 		_sounds[sfx_name] = load(path)
