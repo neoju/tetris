@@ -1,0 +1,14 @@
+=== QA Scenario: Project settings configured for pixel art ===
+Date: Thu Mar  5 12:50:38 PM +07 2026
+
+Test 1: Check viewport width
+window/size/viewport_width=480
+✓ PASS: viewport_width = 480
+
+Test 2: Check stretch mode
+window/stretch/mode="viewport"
+✓ PASS: stretch/mode = "viewport"
+
+Test 3: Check default texture filter
+textures/canvas_textures/default_texture_filter=0
+✓ PASS: default_texture_filter = 0 (Nearest)

@@ -1,0 +1,21 @@
+=== QA Scenario: Block sprites are correct dimensions and format ===
+Date: Thu Mar  5 12:50:27 PM +07 2026
+
+Test 1: Check cyan block dimensions and format
+Size: (32, 32), Mode: RGBA
+✓ PASS: block_cyan.png is 32x32 RGBA
+
+Test 2: Check ghost block dimensions and format
+Size: (32, 32), Mode: RGBA
+✓ PASS: block_ghost.png is 32x32 RGBA
+
+Test 3: Check all 8 block files exist
+-rw-r--r-- 1 neo neo 128 Mar  5 12:30 /home/neo/Dev/me/tetris/assets/blocks/block_blue.png
+-rw-r--r-- 1 neo neo 135 Mar  5 12:30 /home/neo/Dev/me/tetris/assets/blocks/block_cyan.png
+-rw-r--r-- 1 neo neo 121 Mar  5 12:30 /home/neo/Dev/me/tetris/assets/blocks/block_ghost.png
+-rw-r--r-- 1 neo neo 131 Mar  5 12:30 /home/neo/Dev/me/tetris/assets/blocks/block_green.png
+-rw-r--r-- 1 neo neo 133 Mar  5 12:30 /home/neo/Dev/me/tetris/assets/blocks/block_orange.png
+-rw-r--r-- 1 neo neo 135 Mar  5 12:30 /home/neo/Dev/me/tetris/assets/blocks/block_purple.png
+-rw-r--r-- 1 neo neo 131 Mar  5 12:30 /home/neo/Dev/me/tetris/assets/blocks/block_red.png
+-rw-r--r-- 1 neo neo 129 Mar  5 12:30 /home/neo/Dev/me/tetris/assets/blocks/block_yellow.png
+✓ PASS: All 8 block files exist

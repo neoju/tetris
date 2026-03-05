@@ -1,0 +1,37 @@
+=== QA Scenario: Project structure created correctly ===
+Date: Thu Mar  5 12:50:15 PM +07 2026
+
+Test 1: Check project.godot exists
+✓ PASS: project.godot exists
+
+Test 2: Check GUT addon exists
+✓ PASS: GUT addon installed
+
+Test 3: Check block PNG count
+Found 8 PNG files
+✓ PASS: 8 block sprites generated
+total 64
+drwxr-xr-x 1 neo neo 588 Mar  5 12:30 .
+drwxr-xr-x 1 neo neo  18 Mar  5 12:02 ..
+-rw-r--r-- 1 neo neo 128 Mar  5 12:30 block_blue.png
+-rw-r--r-- 1 neo neo 948 Mar  5 12:30 block_blue.png.import
+-rw-r--r-- 1 neo neo 135 Mar  5 12:30 block_cyan.png
+-rw-r--r-- 1 neo neo 948 Mar  5 12:30 block_cyan.png.import
+-rw-r--r-- 1 neo neo 121 Mar  5 12:30 block_ghost.png
+-rw-r--r-- 1 neo neo 951 Mar  5 12:12 block_ghost.png.import
+-rw-r--r-- 1 neo neo 131 Mar  5 12:30 block_green.png
+-rw-r--r-- 1 neo neo 951 Mar  5 12:30 block_green.png.import
+-rw-r--r-- 1 neo neo 133 Mar  5 12:30 block_orange.png
+-rw-r--r-- 1 neo neo 954 Mar  5 12:30 block_orange.png.import
+-rw-r--r-- 1 neo neo 135 Mar  5 12:30 block_purple.png
+-rw-r--r-- 1 neo neo 954 Mar  5 12:30 block_purple.png.import
+-rw-r--r-- 1 neo neo 131 Mar  5 12:30 block_red.png
+-rw-r--r-- 1 neo neo 945 Mar  5 12:30 block_red.png.import
+-rw-r--r-- 1 neo neo 129 Mar  5 12:30 block_yellow.png
+-rw-r--r-- 1 neo neo 954 Mar  5 12:30 block_yellow.png.import
+
+Test 4: Check scripts directory
+✓ PASS: scripts/ directory exists
+
+Test 5: Check test/unit directory
+✓ PASS: test/unit/ directory exists
