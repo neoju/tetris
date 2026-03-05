@@ -1,9 +1,6 @@
 class_name InputHandler
 extends RefCounted
 
-const DAS_DELAY: float = 0.167
-const ARR_RATE: float = 0.033
-
 var _das_timer_left: float = 0.0
 var _das_timer_right: float = 0.0
 var _das_charged_left: bool = false
@@ -94,14 +91,14 @@ func _reset_right_state() -> void:
 func _update_left_repeat(delta: float) -> Vector2i:
 	if not _das_charged_left:
 		_das_timer_left += delta
-		if _das_timer_left >= DAS_DELAY:
+		if _das_timer_left >= Constants.DAS_DELAY:
 			_das_charged_left = true
 			_arr_timer_left = 0.0
 		return Vector2i.ZERO
 
 	_arr_timer_left += delta
-	if _arr_timer_left >= ARR_RATE:
-		_arr_timer_left -= ARR_RATE
+	if _arr_timer_left >= Constants.ARR_RATE:
+		_arr_timer_left -= Constants.ARR_RATE
 		return Vector2i.LEFT
 
 	return Vector2i.ZERO
@@ -110,14 +107,14 @@ func _update_left_repeat(delta: float) -> Vector2i:
 func _update_right_repeat(delta: float) -> Vector2i:
 	if not _das_charged_right:
 		_das_timer_right += delta
-		if _das_timer_right >= DAS_DELAY:
+		if _das_timer_right >= Constants.DAS_DELAY:
 			_das_charged_right = true
 			_arr_timer_right = 0.0
 		return Vector2i.ZERO
 
 	_arr_timer_right += delta
-	if _arr_timer_right >= ARR_RATE:
-		_arr_timer_right -= ARR_RATE
+	if _arr_timer_right >= Constants.ARR_RATE:
+		_arr_timer_right -= Constants.ARR_RATE
 		return Vector2i.RIGHT
 
 	return Vector2i.ZERO

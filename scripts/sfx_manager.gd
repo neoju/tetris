@@ -3,10 +3,9 @@ extends Node
 var _sounds: Dictionary = {}
 var _players: Array[AudioStreamPlayer] = []
 var _next_player: int = 0
-const POOL_SIZE = 4
 
 func _ready() -> void:
-	for i in range(POOL_SIZE):
+	for i in range(Constants.SFX_POOL_SIZE):
 		var player = AudioStreamPlayer.new()
 		add_child(player)
 		_players.append(player)
@@ -24,4 +23,4 @@ func play(sfx_name: String) -> void:
 	var player = _players[_next_player]
 	player.stream = _sounds[sfx_name]
 	player.play()
-	_next_player = (_next_player + 1) % POOL_SIZE
+	_next_player = (_next_player + 1) % Constants.SFX_POOL_SIZE

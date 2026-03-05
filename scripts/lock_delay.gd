@@ -1,9 +1,6 @@
 class_name LockDelay
 extends RefCounted
 
-const LOCK_TIME: float = 0.5
-const MAX_MOVES: int = 15
-
 var _timer: float = 0.0
 var _move_count: int = 0
 var _active: bool = false
@@ -15,7 +12,7 @@ func start() -> void:
 
 
 func reset_on_move() -> void:
-	if _active and _move_count < MAX_MOVES:
+	if _active and _move_count < Constants.MAX_MOVES:
 		_timer = 0.0
 		_move_count += 1
 
@@ -25,7 +22,7 @@ func update(delta: float) -> bool:
 		return false
 
 	_timer += delta
-	return _timer >= LOCK_TIME or _move_count >= MAX_MOVES
+	return _timer >= Constants.LOCK_TIME or _move_count >= Constants.MAX_MOVES
 
 
 func cancel() -> void:

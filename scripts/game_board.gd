@@ -1,24 +1,33 @@
 extends Node2D
 
+const Constants = preload("res://scripts/constants.gd")
 const GameLogicScript = preload("res://scripts/game_logic.gd")
 const GridScript = preload("res://scripts/grid.gd")
+const TetrominoDataScript = preload("res://scripts/tetromino_data.gd")
 
-const CELL_SIZE = 32
-const BOARD_OFFSET = Vector2(80, 0)
-const COLS = GridScript.WIDTH
-const VISIBLE_ROWS = GridScript.VISIBLE_HEIGHT
-const BUFFER_ROWS = GridScript.BUFFER_ROWS
+# Particle scenes
+const ClearParticlesScene = preload("res://scenes/particles/ClearParticles.tscn")
+const LockSparksScene = preload("res://scenes/particles/LockSparks.tscn")
+const HardDropImpactScene = preload("res://scenes/particles/HardDropImpact.tscn")
+const AmbientSparklesScene = preload("res://scenes/particles/AmbientSparkles.tscn")
 
-const FLOAT_SPEED = 45.0
-const FLOAT_DURATION = 1.6
-const FLOAT_HOLD_RATIO = 0.3
-const SCALE_PUNCH = 1.4
-const SCALE_SETTLE_TIME = 0.15
+# Layout: board centered with side panels
+# Board = 10 cols × 24 rows = 320 × 768
+# Viewport = 480 × 1040
 
 var game_logic: GameLogicScript
 var textures: Dictionary = {}
 var game_manager = null
 var _floating_texts: Array = []
+
+# --- VFX State ---
+var _clear_anim: Dictionary = {}       # {"timer": float, "rows_data": Array, "lines": int}
+var _shake_intensity: float = 0.0
+var _shake_timer: float = 0.0
+var _original_position: Vector2 = Vector2.ZERO
+var _border_glow: float = 0.0
+var _border_glow_color: Color = Color.WHITE
+
 
 func _ready() -> void:
 	var type_to_color = {
@@ -34,13 +43,30 @@ func _ready() -> void:
 		textures[piece_type] = load("res://assets/blocks/block_" + type_to_color[piece_type] + ".png")
 	textures["ghost"] = load("res://assets/blocks/block_ghost.png")
 
+	_original_position = position
+	_setup_ambient_sparkles()
+
 	game_logic = GameLogicScript.new()
 	game_logic.start_game()
 
 func clear_floating_texts() -> void:
 	_floating_texts.clear()
+	_clear_anim = {}
+	_border_glow = 0.0
+	_shake_intensity = 0.0
+	position = _original_position
 
 func _process(delta: float) -> void:
+	# Update VFX timers regardless of game state
+	_update_shake(delta)
+	_update_border_glow(delta)
+
+	# Handle clear animation in progress
+	if _is_clearing():
+		_update_clear_anim(delta)
+		queue_redraw()
+		return
+
 	if game_logic != null:
 		var events = game_logic.update(delta)
 
@@ -50,6 +76,15 @@ func _process(delta: float) -> void:
 			SfxManager.play("rotate")
 		if events.get("hard_dropped", false):
 			SfxManager.play("hard_drop")
+			
+		if events.has("hard_drop_impact"):
+			var distance: int = events["hard_drop_impact"].get("distance", 0)
+			var impact_shake = clampf(1.0 + (float(distance) / 1.0), 1.0, 5.0)
+			if _shake_intensity < impact_shake:
+				_shake_intensity = impact_shake
+				_shake_timer = 0.0
+			_spawn_hard_drop_impact_particles(events)
+
 		if events.get("soft_dropped", false):
 			SfxManager.play("soft_drop")
 		if events.get("hold_swapped", false):
@@ -72,8 +107,16 @@ func _process(delta: float) -> void:
 			elif combo >= 4:
 				SfxManager.play("combo_high")
 
+			# Lock impact sparks on every piece lock
+			_spawn_lock_sparks(events)
+
 			if events.get("lines_cleared", 0) > 0:
 				_spawn_floating_text(events)
+				_start_clear_animation(events)
+				_trigger_shake(events)
+				_trigger_border_glow(events)
+				_spawn_clear_particles(events)
+
 		if events.get("level_up", false):
 			SfxManager.play("level_up")
 		if events.get("game_over", false):
@@ -81,15 +124,366 @@ func _process(delta: float) -> void:
 			if game_manager != null:
 				game_manager.on_game_over(game_logic.scoring.score)
 
-		_update_floating_texts(delta)
-		queue_redraw()
+	_update_floating_texts(delta)
+	queue_redraw()
+
+
+# =============================================================================
+# LINE CLEAR ANIMATION
+# =============================================================================
+
+func _is_clearing() -> bool:
+	return _clear_anim.size() > 0
+
+
+func _start_clear_animation(events: Dictionary) -> void:
+	var rows_data = events.get("cleared_rows_data", [])
+	if rows_data.size() == 0:
+		return
+	_clear_anim = {
+		"timer": 0.0,
+		"rows_data": rows_data,
+		"lines": events.get("lines_cleared", 0),
+	}
+
+
+func _update_clear_anim(delta: float) -> void:
+	if _clear_anim.size() == 0:
+		return
+
+	_clear_anim["timer"] += delta
+
+	# Also update floating texts during clear anim so they don't freeze
+	_update_floating_texts(delta)
+
+	if _clear_anim["timer"] >= Constants.CLEAR_TOTAL_DURATION:
+		# Animation done — actually clear the grid rows
+		_clear_anim = {}
+		if game_logic != null:
+			var result = game_logic.complete_clear()
+			if result.get("game_over", false):
+				SfxManager.play("game_over")
+				if game_manager != null:
+					game_manager.on_game_over(game_logic.scoring.score)
+
+
+func _draw_clear_animations() -> void:
+	if _clear_anim.size() == 0:
+		return
+
+	var timer: float = _clear_anim["timer"]
+	var rows_data: Array = _clear_anim["rows_data"]
+	var board_w = Constants.COLS * Constants.CELL_SIZE
+
+	for row_info in rows_data:
+		var row: int = row_info["row"]
+		var cells: Array = row_info["cells"]
+		var row_y = Constants.BOARD_OFFSET.y + row * Constants.CELL_SIZE
+
+		if timer < Constants.CLEAR_FLASH_DURATION:
+			# Phase 1: White flash overlay on the full row
+			var flash_t = timer / Constants.CLEAR_FLASH_DURATION
+			var flash_alpha = 1.0 - flash_t * 0.3  # Start bright, slight fade
+			var flash_rect = Rect2(Constants.BOARD_OFFSET.x, row_y, board_w, Constants.CELL_SIZE)
+			draw_rect(flash_rect, Color(1.0, 1.0, 1.0, flash_alpha))
+		else:
+			# Phase 2: Dissolve — blocks fade out with decreasing alpha
+			var dissolve_t = (timer - Constants.CLEAR_FLASH_DURATION) / Constants.CLEAR_DISSOLVE_DURATION
+			dissolve_t = clampf(dissolve_t, 0.0, 1.0)
+			var alpha = 1.0 - dissolve_t
+
+			for col in range(cells.size()):
+				var cell_type = cells[col]
+				if cell_type != "" and textures.has(cell_type):
+					var pos = Vector2(Constants.BOARD_OFFSET.x + col * Constants.CELL_SIZE, row_y)
+					draw_set_transform(pos, 0.0, Vector2.ONE)
+					var mod_color = Color(1.0, 1.0, 1.0, alpha)
+					draw_texture(textures[cell_type], Vector2.ZERO, mod_color)
+
+			# Reset transform
+			draw_set_transform(Vector2.ZERO, 0.0, Vector2.ONE)
+
+
+func _get_clearing_rows() -> Array[int]:
+	if _clear_anim.size() == 0:
+		return []
+	var rows: Array[int] = []
+	for row_info in _clear_anim["rows_data"]:
+		rows.append(row_info["row"])
+	return rows
+
+
+# =============================================================================
+# SCREEN SHAKE
+# =============================================================================
+
+func _trigger_shake(events: Dictionary) -> void:
+	var lines = events.get("lines_cleared", 0)
+	var is_tspin = events.get("is_tspin", false)
+	var is_pc = events.get("is_perfect_clear", false)
+
+	if is_pc:
+		_shake_intensity = 12.0
+	elif lines == 4 or is_tspin:
+		_shake_intensity = 8.0
+	elif lines == 3:
+		_shake_intensity = 5.0
+	elif lines == 2:
+		_shake_intensity = 3.5
+	else:
+		_shake_intensity = 2.0
+
+	_shake_timer = 0.0
+
+
+func _update_shake(delta: float) -> void:
+	if _shake_intensity <= 0.1:
+		_shake_intensity = 0.0
+		position = _original_position
+		return
+
+	_shake_timer += delta
+	_shake_intensity *= exp(-Constants.SHAKE_DECAY * delta)
+
+	var offset = Vector2(
+		randf_range(-_shake_intensity, _shake_intensity),
+		randf_range(-_shake_intensity, _shake_intensity)
+	)
+	position = _original_position + offset
+
+
+# =============================================================================
+# BORDER GLOW
+# =============================================================================
+
+func _trigger_border_glow(events: Dictionary) -> void:
+	var lines = events.get("lines_cleared", 0)
+	var is_tspin = events.get("is_tspin", false)
+	var is_pc = events.get("is_perfect_clear", false)
+
+	if is_pc:
+		_border_glow = 1.0
+		_border_glow_color = Color(1.0, 0.2, 1.0)  # Magenta for perfect clear
+	elif lines == 4 or is_tspin:
+		_border_glow = 1.0
+		_border_glow_color = Color(0.0, 1.0, 1.0)  # Cyan for Tetris/T-spin
+	elif lines >= 2:
+		_border_glow = 0.7
+		_border_glow_color = Color(1.0, 1.0, 0.3)  # Yellow for multi-line
+	else:
+		_border_glow = 0.4
+		_border_glow_color = Color.WHITE
+
+
+func _update_border_glow(delta: float) -> void:
+	if _border_glow <= 0.01:
+		_border_glow = 0.0
+		return
+	_border_glow *= exp(-Constants.BORDER_GLOW_DECAY * delta)
+
+
+func _draw_border_glow() -> void:
+	if _border_glow <= 0.01:
+		return
+
+	var board_w = Constants.COLS * Constants.CELL_SIZE
+	var board_h = Constants.TOTAL_ROWS * Constants.CELL_SIZE
+
+	# Draw multiple expanding border rings with decreasing opacity
+	for i in range(4):
+		var expand = float(i) * 2.0
+		var alpha = _border_glow * (1.0 - float(i) * 0.25)
+		if alpha <= 0.0:
+			continue
+		var glow_color = _border_glow_color
+		glow_color.a = alpha * 0.6
+		var glow_rect = Rect2(
+			Constants.BOARD_OFFSET.x - expand,
+			Constants.BOARD_OFFSET.y - expand,
+			board_w + expand * 2.0,
+			board_h + expand * 2.0
+		)
+		draw_rect(glow_rect, glow_color, false, 1.5 + float(i) * 0.5)
+
+
+# =============================================================================
+# DEBRIS PARTICLES (line clear burst)
+# =============================================================================
+
+func _spawn_clear_particles(events: Dictionary) -> void:
+	var rows_data = events.get("cleared_rows_data", [])
+	if rows_data.size() == 0:
+		return
+
+	var lines = events.get("lines_cleared", 0)
+
+	for row_info in rows_data:
+		var row: int = row_info["row"]
+		var cells: Array = row_info["cells"]
+		var row_y = Constants.BOARD_OFFSET.y + row * Constants.CELL_SIZE + Constants.CELL_SIZE * 0.5
+
+		# Collect colors for this row
+		var row_colors: Array[Color] = []
+		for cell_type in cells:
+			if cell_type != "" and TetrominoDataScript.COLORS.has(cell_type):
+				var c: Color = TetrominoDataScript.COLORS[cell_type]
+				if c not in row_colors:
+					row_colors.append(c)
+
+		if row_colors.size() == 0:
+			row_colors.append(Color.WHITE)
+
+		# Use particle scene
+		var particles = ClearParticlesScene.instantiate()
+		var primary_color = row_colors[0]
+		var p_pos = Vector2(Constants.BOARD_OFFSET.x + Constants.COLS * Constants.CELL_SIZE * 0.5, row_y)
+		var p_amount = 90 + lines * 18
+		var p_width = Constants.COLS * Constants.CELL_SIZE * 0.5
+		particles.configure(p_pos, primary_color, p_amount, p_width)
+		add_child(particles)
+
+
+func _draw_hard_drop_starfall(active_positions: Array[Vector2i], state: Dictionary) -> void:
+	if active_positions.size() == 0:
+		return
+
+	var start_y: int = state.get("start_y", 0)
+	var current_y: int = state.get("current_y", start_y)
+	var progress: float = state.get("progress", 1.0)
+
+	for block_pos in active_positions:
+		var local_y := block_pos.y - current_y
+		var to_y := Constants.BOARD_OFFSET.y + float(block_pos.y) * Constants.CELL_SIZE + Constants.CELL_SIZE * 0.5
+		var x := Constants.BOARD_OFFSET.x + float(block_pos.x) * Constants.CELL_SIZE + Constants.CELL_SIZE * 0.5
+
+		# Cap trail length to last 3 cells for shorter, more focused effect
+		var max_trail_cells := 7.0
+		var original_from_y := Constants.BOARD_OFFSET.y + float(start_y + local_y) * Constants.CELL_SIZE + Constants.CELL_SIZE * 0.5
+		var from_y := maxf(original_from_y, to_y - (max_trail_cells * Constants.CELL_SIZE))
+
+		var trail_alpha := 0.45 * (1.0 - progress * 0.35)
+		if to_y > from_y + 1.0:
+			draw_line(
+				Vector2(x, from_y),
+				Vector2(x, to_y),
+				Color(1.0, 1.0, 0.92, trail_alpha),
+				2.0
+			)
+
+		# Falling-star head
+		draw_circle(
+			Vector2(x, to_y),
+			2.2,
+			Color(1.0, 1.0, 1.0, 0.65)
+		)
+
+
+func _make_fade_curve() -> Curve:
+	var curve = Curve.new()
+	curve.add_point(Vector2(0.0, 1.0))
+	curve.add_point(Vector2(0.5, 0.8))
+	curve.add_point(Vector2(1.0, 0.0))
+	return curve
+
+
+# =============================================================================
+# PIECE LOCK IMPACT SPARKS
+# =============================================================================
+
+func _spawn_lock_sparks(events: Dictionary) -> void:
+	var positions = events.get("locked_positions", [])
+	var piece_type: String = events.get("locked_piece_type", "")
+	if positions.size() == 0:
+		return
+
+	# Find the bottommost row of the locked piece for impact point
+	var bottom_y: int = -1
+	for pos in positions:
+		if pos.y > bottom_y:
+			bottom_y = pos.y
+
+	# Collect bottom-row block positions for spark emission
+	var bottom_blocks: Array[Vector2i] = []
+	for pos in positions:
+		if pos.y == bottom_y:
+			bottom_blocks.append(pos)
+
+	# Get piece color
+	var spark_color = Color.WHITE
+	if piece_type != "" and TetrominoDataScript.COLORS.has(piece_type):
+		spark_color = TetrominoDataScript.COLORS[piece_type]
+
+	# Spawn a small burst at each bottom block
+	for block_pos in bottom_blocks:
+		var screen_pos = grid_to_screen(block_pos) + Vector2(Constants.CELL_SIZE * 0.5, Constants.CELL_SIZE)
+
+		var particles = LockSparksScene.instantiate()
+		particles.configure(screen_pos, spark_color)
+		add_child(particles)
+
+func _spawn_hard_drop_impact_particles(events: Dictionary) -> void:
+	var positions = events.get("locked_positions", [])
+	var piece_type: String = events.get("locked_piece_type", "")
+	var impact_data = events.get("hard_drop_impact", {})
+	var distance = impact_data.get("distance", 0)
+	
+	if positions.size() == 0:
+		return
+
+	# Find bottommost row
+	var bottom_y: int = -1
+	for pos in positions:
+		if pos.y > bottom_y:
+			bottom_y = pos.y
+
+	# Collect bottom blocks
+	var bottom_blocks: Array[Vector2i] = []
+	for pos in positions:
+		if pos.y == bottom_y:
+			bottom_blocks.append(pos)
+
+	var spark_color = Color.WHITE
+	if piece_type != "" and TetrominoDataScript.COLORS.has(piece_type):
+		spark_color = TetrominoDataScript.COLORS[piece_type]
+
+	# Scale effect with distance
+	var particle_amount = int(clamp(12 + distance * 2, 12, 40))
+	var vel_min = 60.0 + (distance * 3.0)
+	var vel_max = 120.0 + (distance * 5.0)
+
+	for block_pos in bottom_blocks:
+		var screen_pos = grid_to_screen(block_pos) + Vector2(Constants.CELL_SIZE * 0.5, Constants.CELL_SIZE)
+
+		var particles = HardDropImpactScene.instantiate()
+		particles.configure(screen_pos, spark_color, particle_amount, vel_min, vel_max)
+		add_child(particles)
+
+# =============================================================================
+# AMBIENT SPARKLE PARTICLES (persistent atmospheric effect)
+# =============================================================================
+
+func _setup_ambient_sparkles() -> void:
+	var play_top = Constants.BOARD_OFFSET.y + Constants.BUFFER_ROWS * Constants.CELL_SIZE
+	var play_h = Constants.VISIBLE_ROWS * Constants.CELL_SIZE
+	var board_w = Constants.COLS * Constants.CELL_SIZE
+
+	var sparkles = AmbientSparklesScene.instantiate()
+	sparkles.name = "AmbientSparkles"
+	var p_pos = Vector2(Constants.BOARD_OFFSET.x + board_w * 0.5, play_top + play_h)
+	sparkles.configure(p_pos, board_w * 0.5)
+	add_child(sparkles)
+
+
+# =============================================================================
+# FLOATING TEXTS
+# =============================================================================
 
 func _update_floating_texts(delta: float) -> void:
 	var i = _floating_texts.size() - 1
 	while i >= 0:
 		var ft = _floating_texts[i]
 		ft["timer"] += delta
-		ft["position"].y -= FLOAT_SPEED * delta
+		ft["position"].y -= Constants.FLOAT_SPEED * delta
 		if ft["timer"] >= ft["duration"]:
 			_floating_texts.remove_at(i)
 		i -= 1
@@ -114,8 +508,10 @@ func _spawn_floating_text(events: Dictionary) -> void:
 	elif is_b2b:
 		b2b_text = "BACK TO BACK"
 
-	var center_x = BOARD_OFFSET.x + (COLS * CELL_SIZE) / 2.0
-	var spawn_y = VISIBLE_ROWS * CELL_SIZE * 0.4
+	var center_x = Constants.BOARD_OFFSET.x + (Constants.COLS * Constants.CELL_SIZE) / 2.0
+	# Spawn in the middle of the visible playfield (rows 4-23)
+	var playfield_top = Constants.BOARD_OFFSET.y + Constants.BUFFER_ROWS * Constants.CELL_SIZE
+	var spawn_y = playfield_top + Constants.VISIBLE_ROWS * Constants.CELL_SIZE * 0.4
 
 	_floating_texts.append({
 		"score_text": score_text,
@@ -124,7 +520,7 @@ func _spawn_floating_text(events: Dictionary) -> void:
 		"b2b_text": b2b_text,
 		"position": Vector2(center_x, spawn_y),
 		"timer": 0.0,
-		"duration": FLOAT_DURATION,
+		"duration": Constants.FLOAT_DURATION,
 		"font_size": _score_to_font_size(score_added),
 		"color": _get_score_color(lines, is_tspin, is_b2b, is_pc),
 		"combo_count": combo,
@@ -180,14 +576,14 @@ func _draw_floating_texts() -> void:
 	var font = ThemeDB.fallback_font
 	for ft in _floating_texts:
 		var t = ft["timer"] / ft["duration"]
-		var hold_end = FLOAT_HOLD_RATIO
+		var hold_end = Constants.FLOAT_HOLD_RATIO
 		var alpha = 1.0
 		if t > hold_end:
 			alpha = 1.0 - (t - hold_end) / (1.0 - hold_end)
 		alpha = clampf(alpha, 0.0, 1.0)
 
-		var scale_t = clampf(ft["timer"] / SCALE_SETTLE_TIME, 0.0, 1.0)
-		var scale_factor = lerpf(SCALE_PUNCH, 1.0, scale_t)
+		var scale_t = clampf(ft["timer"] / Constants.SCALE_SETTLE_TIME, 0.0, 1.0)
+		var scale_factor = lerpf(Constants.SCALE_PUNCH, 1.0, scale_t)
 
 		var pos = ft["position"]
 		var base_size: int = ft["font_size"]
@@ -221,26 +617,46 @@ func _draw_floating_texts() -> void:
 			draw_string(font, Vector2(pos.x - 100, y_cursor), ft["combo_text"],
 				HORIZONTAL_ALIGNMENT_CENTER, 200, combo_size, combo_color)
 
+
+# =============================================================================
+# DRAWING
+# =============================================================================
+
 func grid_to_screen(grid_pos: Vector2i) -> Vector2:
-	return BOARD_OFFSET + Vector2(grid_pos.x * CELL_SIZE, (grid_pos.y - BUFFER_ROWS) * CELL_SIZE)
+	return Constants.BOARD_OFFSET + Vector2(grid_pos.x * Constants.CELL_SIZE, grid_pos.y * Constants.CELL_SIZE)
 
 func _draw() -> void:
 	if game_logic == null:
 		return
-		
-	var bg_rect = Rect2(BOARD_OFFSET.x, 0, COLS * CELL_SIZE, VISIBLE_ROWS * CELL_SIZE)
-	draw_rect(bg_rect, Color(0.1, 0.1, 0.15))
 
-	var line_color = Color(0.2, 0.2, 0.25)
-	for i in range(COLS + 1):
-		var x = BOARD_OFFSET.x + i * CELL_SIZE
-		draw_line(Vector2(x, 0), Vector2(x, VISIBLE_ROWS * CELL_SIZE), line_color)
-	for j in range(VISIBLE_ROWS + 1):
-		var y = j * CELL_SIZE
-		draw_line(Vector2(BOARD_OFFSET.x, y), Vector2(BOARD_OFFSET.x + COLS * CELL_SIZE, y), line_color)
+	var board_w = Constants.COLS * Constants.CELL_SIZE
+	var board_h = Constants.TOTAL_ROWS * Constants.CELL_SIZE  # Full 24 rows
 
+	var board_rect = Rect2(Constants.BOARD_OFFSET.x, Constants.BOARD_OFFSET.y, board_w, board_h)
+
+	# Subtle grid lines — full board (all 24 rows)
+	var play_top = Constants.BOARD_OFFSET.y
+	var play_h = Constants.TOTAL_ROWS * Constants.CELL_SIZE
+	for i in range(1, Constants.COLS):
+		var x = Constants.BOARD_OFFSET.x + i * Constants.CELL_SIZE
+		draw_line(Vector2(x, play_top), Vector2(x, play_top + play_h), Constants.GRID_LINE_COLOR)
+	for j in range(1, Constants.TOTAL_ROWS):
+		var y = play_top + j * Constants.CELL_SIZE
+		draw_line(Vector2(Constants.BOARD_OFFSET.x, y), Vector2(Constants.BOARD_OFFSET.x + board_w, y), Constants.GRID_LINE_COLOR)
+
+	# Thin white border around entire board area (all 24 rows)
+	draw_rect(board_rect, Constants.BORDER_COLOR, false, Constants.BORDER_WIDTH)
+
+	# Border glow (drawn on top of normal border)
+	_draw_border_glow()
+
+	# Draw locked blocks — ALL rows (including spawn zone)
+	# Skip rows that are currently being animated (clear animation draws them separately)
+	var clearing_rows = _get_clearing_rows()
 	var grid = game_logic.grid
-	for y in range(BUFFER_ROWS, grid.HEIGHT):
+	for y in range(grid.HEIGHT):
+		if y in clearing_rows:
+			continue
 		for x in range(grid.WIDTH):
 			var cell_value = grid.cells[y][x]
 			if cell_value != "":
@@ -248,22 +664,37 @@ func _draw() -> void:
 				if textures.has(cell_value):
 					draw_texture(textures[cell_value], pos)
 
+	# Draw clear animation overlays (flash / dissolve)
+	_draw_clear_animations()
+
+	# Ghost piece — visible from row 0
 	var active_positions: Array[Vector2i] = []
 	if game_logic.active_piece != null:
 		active_positions = game_logic.active_piece.get_block_positions()
+	var hard_drop_state := game_logic.get_hard_drop_visual_state()
 
 	var ghost_positions = game_logic.get_ghost_blocks()
 	for ghost_pos in ghost_positions:
-		if ghost_pos.y >= BUFFER_ROWS and not ghost_pos in active_positions:
+		if ghost_pos.y >= 0 and not ghost_pos in active_positions:
 			var pos = grid_to_screen(ghost_pos)
 			draw_texture(textures["ghost"], pos)
 
+	# Active piece with glow — brighter than locked blocks
 	if game_logic.active_piece != null:
 		var piece_type = game_logic.active_piece.type
 		if textures.has(piece_type):
+			if hard_drop_state.get("active", false):
+				_draw_hard_drop_starfall(active_positions, hard_drop_state)
 			for active_pos in active_positions:
-				if active_pos.y >= BUFFER_ROWS:
+				if active_pos.y >= 0:
 					var pos = grid_to_screen(active_pos)
+					# Draw normal block
 					draw_texture(textures[piece_type], pos)
+					# Additive glow overlay — brighter, slightly larger feel
+					var glow_alpha := 0.2
+					if hard_drop_state.get("active", false):
+						glow_alpha = 0.45
+					var glow_color = Color(1.0, 1.0, 1.0, glow_alpha)
+					draw_texture(textures[piece_type], pos, glow_color)
 
 	_draw_floating_texts()
