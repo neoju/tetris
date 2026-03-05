@@ -10,6 +10,7 @@ var menu: Control
 var pause_overlay: CanvasLayer
 var game_over_overlay: CanvasLayer
 var final_score_label: Label
+var menu_button: Button
 
 
 func _ready() -> void:
@@ -18,27 +19,38 @@ func _ready() -> void:
 	ui_panel = $UIPanel
 	pause_overlay = $PauseOverlay
 	game_over_overlay = $GameOverOverlay
-	
+
 	game_board.game_manager = self
-	
+
 	var start_btn = menu.get_node("CenterContainer/VBoxContainer/StartButton")
 	start_btn.pressed.connect(_on_start_game)
-	
+
 	var resume_btn = pause_overlay.get_node("Control/CenterContainer/VBoxContainer/ResumeButton")
 	resume_btn.pressed.connect(_resume)
-	
+
 	var quit_to_menu_btn = pause_overlay.get_node("Control/CenterContainer/VBoxContainer/QuitButton")
 	quit_to_menu_btn.pressed.connect(_quit_to_menu_from_pause)
-	
+
 	var play_again_btn = game_over_overlay.get_node("Control/CenterContainer/VBoxContainer/PlayAgainButton")
 	play_again_btn.pressed.connect(_play_again)
-	
+
 	var menu_btn = game_over_overlay.get_node("Control/CenterContainer/VBoxContainer/MenuButton")
 	menu_btn.pressed.connect(_quit_to_menu_from_game_over)
-	
+
 	final_score_label = game_over_overlay.get_node("Control/CenterContainer/VBoxContainer/FinalScoreLabel")
-	
+
+	# Create in-game menu button (hamburger ≡)
+	_create_menu_button()
+
 	_show_menu()
+	_on_start_game()
+
+
+func _create_menu_button() -> void:
+	# Get menu button from ui_panel scene (authored in .tscn)
+	menu_button = ui_panel.get_node("MenuButton")
+	menu_button.visible = false
+	menu_button.pressed.connect(_pause)
 
 
 func _unhandled_input(event: InputEvent) -> void:
@@ -54,7 +66,8 @@ func _on_start_game() -> void:
 	menu.hide()
 	game_board.show()
 	ui_panel.show()
-	
+	menu_button.visible = true
+
 	ui_panel.game_logic = game_board.game_logic
 	game_board.game_logic.start_game()
 	game_board.clear_floating_texts()
@@ -65,6 +78,7 @@ func _on_start_game() -> void:
 func _pause() -> void:
 	current_state = State.PAUSED
 	pause_overlay.show()
+	menu_button.visible = false
 	game_board.set_process(false)
 	ui_panel.set_process(false)
 
@@ -72,12 +86,14 @@ func _pause() -> void:
 func _resume() -> void:
 	current_state = State.PLAYING
 	pause_overlay.hide()
+	menu_button.visible = true
 	game_board.set_process(true)
 	ui_panel.set_process(true)
 
 
 func on_game_over(final_score: int) -> void:
 	current_state = State.GAME_OVER
+	menu_button.visible = false
 	game_board.set_process(false)
 	ui_panel.set_process(false)
 	final_score_label.text = "Score: " + str(final_score)
@@ -87,6 +103,7 @@ func on_game_over(final_score: int) -> void:
 func _play_again() -> void:
 	current_state = State.PLAYING
 	game_over_overlay.hide()
+	menu_button.visible = true
 	game_board.game_logic.start_game()
 	game_board.clear_floating_texts()
 	game_board.set_process(true)
@@ -98,6 +115,7 @@ func _quit_to_menu_from_pause() -> void:
 	pause_overlay.hide()
 	game_board.hide()
 	ui_panel.hide()
+	menu_button.visible = false
 	menu.show()
 
 
@@ -106,6 +124,7 @@ func _quit_to_menu_from_game_over() -> void:
 	game_over_overlay.hide()
 	game_board.hide()
 	ui_panel.hide()
+	menu_button.visible = false
 	menu.show()
 
 
@@ -114,6 +133,7 @@ func _show_menu() -> void:
 	menu.show()
 	game_board.hide()
 	ui_panel.hide()
+	menu_button.visible = false
 	pause_overlay.hide()
 	game_over_overlay.hide()
 	game_board.set_process(false)
