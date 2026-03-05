@@ -1,6 +1,14 @@
 [gd_scene load_steps=2 format=3 uid="uid://gameboarduid123"]
 
-[ext_resource type="Script" path="res://scripts/game_board.gd" id="1_gb"]
+[ext_resource type="Script" uid="uid://mvy2xwojnsb6" path="res://scripts/game_board.gd" id="1_gb"]
 
 [node name="GameBoard" type="Node2D"]
 script = ExtResource("1_gb")
+
+[node name="BoardBG" type="ColorRect" parent="."]
+show_behind_parent = true
+offset_left = 80.0
+offset_top = 86.0
+offset_right = 400.0
+offset_bottom = 854.0
+color = Color(0.07, 0.07, 0.11, 0.82)

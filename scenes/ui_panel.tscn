@@ -1,8 +1,57 @@
-[gd_scene load_steps=2 format=3]
+[gd_scene format=3 uid="uid://34dap23k4cd3"]
 
-[ext_resource type="Script" path="res://scripts/ui_panel.gd" id="1_abc"]
+[ext_resource type="Script" uid="uid://bbp6ux3gi11t1" path="res://scripts/ui_panel.gd" id="1_abc"]
+[ext_resource type="Script" uid="uid://dmdxng62rto4o" path="res://scripts/piece_overlay.gd" id="2_overlay"]
 
-[node name="UIPanel" type="Control"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_panel"]
+bg_color = Color(0.07, 0.07, 0.11, 0.8)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.45, 0.45, 0.55, 0.6)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_menu_normal"]
+bg_color = Color(0.07, 0.07, 0.11, 0.8)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.1, 0.3, 0.5, 0.3)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_menu_hover"]
+bg_color = Color(0.15, 0.15, 0.2, 0.9)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.2, 0.8, 1, 0.8)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_menu_pressed"]
+bg_color = Color(0.05, 0.05, 0.08, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.2, 0.8, 1, 1)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+
+[node name="UIPanel" type="Control" unique_id=936204152]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -11,3 +60,143 @@ grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
 script = ExtResource("1_abc")
+
+[node name="HoldBG" type="Panel" parent="." unique_id=2112773257]
+layout_mode = 0
+offset_left = 2.0
+offset_top = 86.0
+offset_right = 76.0
+offset_bottom = 174.0
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_panel")
+
+[node name="HoldHeader" type="ColorRect" parent="." unique_id=462196234]
+layout_mode = 0
+offset_left = 2.0
+offset_top = 86.0
+offset_right = 76.0
+offset_bottom = 108.0
+color = Color(0.55, 0.5, 0.65, 0.85)
+
+[node name="HoldLabel" type="Label" parent="." unique_id=1620893748]
+layout_mode = 0
+offset_left = 2.0
+offset_top = 86.0
+offset_right = 76.0
+offset_bottom = 108.0
+theme_override_colors/font_color = Color(0.95, 0.95, 1, 1)
+theme_override_font_sizes/font_size = 13
+text = "HOLD"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="NextBG" type="Panel" parent="." unique_id=1792264568]
+layout_mode = 0
+offset_left = 404.0
+offset_top = 86.0
+offset_right = 478.0
+offset_bottom = 318.0
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_panel")
+
+[node name="NextHeader" type="ColorRect" parent="." unique_id=396947333]
+layout_mode = 0
+offset_left = 404.0
+offset_top = 86.0
+offset_right = 478.0
+offset_bottom = 108.0
+color = Color(0.55, 0.5, 0.65, 0.85)
+
+[node name="NextLabel" type="Label" parent="." unique_id=632189823]
+layout_mode = 0
+offset_left = 404.0
+offset_top = 86.0
+offset_right = 478.0
+offset_bottom = 108.0
+theme_override_colors/font_color = Color(0.95, 0.95, 1, 1)
+theme_override_font_sizes/font_size = 13
+text = "NEXT"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="ScoreValue" type="Label" parent="." unique_id=6771264]
+layout_mode = 0
+offset_left = 80.0
+offset_top = 854.0
+offset_right = 400.0
+offset_bottom = 898.0
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_font_sizes/font_size = 30
+text = "0"
+horizontal_alignment = 1
+vertical_alignment = 2
+
+[node name="LevelLabel" type="Label" parent="." unique_id=1138883398]
+layout_mode = 0
+offset_left = 80.0
+offset_top = 902.0
+offset_right = 400.0
+offset_bottom = 920.0
+theme_override_colors/font_color = Color(0.5, 0.55, 0.65, 1)
+theme_override_font_sizes/font_size = 12
+text = "LEVEL"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="LevelValue" type="Label" parent="." unique_id=1859627967]
+layout_mode = 0
+offset_left = 80.0
+offset_top = 920.0
+offset_right = 400.0
+offset_bottom = 948.0
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_font_sizes/font_size = 20
+text = "1"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="LinesLabel" type="Label" parent="." unique_id=902265708]
+layout_mode = 0
+offset_left = 80.0
+offset_top = 950.0
+offset_right = 400.0
+offset_bottom = 968.0
+theme_override_colors/font_color = Color(0.5, 0.55, 0.65, 1)
+theme_override_font_sizes/font_size = 12
+text = "LINES"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="LinesValue" type="Label" parent="." unique_id=330077406]
+layout_mode = 0
+offset_left = 80.0
+offset_top = 968.0
+offset_right = 400.0
+offset_bottom = 996.0
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_font_sizes/font_size = 20
+text = "0"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="PieceOverlay" type="Control" parent="." unique_id=1481415004]
+anchors_preset = 0
+offset_right = 480.0
+offset_bottom = 1040.0
+mouse_filter = 2
+script = ExtResource("2_overlay")
+
+[node name="MenuButton" type="Button" parent="."]
+offset_left = 408.0
+offset_top = 4.0
+offset_right = 474.0
+offset_bottom = 44.0
+theme_override_colors/font_color = Color(0.8, 0.9, 1, 1)
+theme_override_colors/font_hover_color = Color(1, 1, 1, 1)
+theme_override_colors/font_pressed_color = Color(0.2, 0.8, 1, 1)
+theme_override_font_sizes/font_size = 28
+theme_override_styles/normal = SubResource("StyleBoxFlat_menu_normal")
+theme_override_styles/hover = SubResource("StyleBoxFlat_menu_hover")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_menu_pressed")
+theme_override_styles/focus = SubResource("StyleBoxFlat_menu_hover")
+text = "≡"
