@@ -1,0 +1,112 @@
+Godot Engine v4.6.1.stable.arch_linux.14d19694e - https://godotengine.org
+
+---  GUT  ---
+[1m[INFO]:  [0musing [/home/neo/.local/share/godot/app_userdata/tetris] for temporary output.
+Godot version:  4.6.1
+GUT version:  9.6.0
+WARNING: The constant "TetrominoData" has the same name as a global class defined in "tetromino_data.gd".
+     at: GDScript::reload (res://test/unit/test_rotation.gd:5)
+     GDScript backtrace (most recent call first):
+         [0] load_script_using_custom_warnings (res://addons/gut/warnings_manager.gd:173)
+         [1] _parse_script (res://addons/gut/test_collector.gd:76)
+         [2] add_script (res://addons/gut/test_collector.gd:127)
+         [3] add_script (res://addons/gut/gut.gd:1053)
+         [4] add_directory (res://addons/gut/gut.gd:1076)
+         [5] _apply_options (res://addons/gut/gut_config.gd:136)
+         [6] apply_options (res://addons/gut/gut_config.gd:207)
+         [7] run_tests (res://addons/gut/gui/GutRunner.gd:192)
+         [8] _run_tests (res://addons/gut/cli/gut_cli.gd:238)
+         [9] main (res://addons/gut/cli/gut_cli.gd:284)
+         [10] _init (res://addons/gut/gut_cmdln.gd:38)
+[4m
+
+res://test/unit/test_bag.gd
+[0m* test_bag_contains_all_seven
+* test_second_bag_is_different_order
+* test_peek_does_not_consume
+* test_peek_across_bag_boundary
+* test_maximum_drought
+* test_reset
+* test_empty_bag_promotes_next
+[1m7/7 passed.
+[0m[4m
+
+res://test/unit/test_grid.gd
+[0m* test_empty_grid_allows_placement
+* test_collision_with_left_wall
+* test_collision_with_right_wall
+* test_collision_with_floor
+* test_collision_with_existing_blocks
+* test_single_line_clear
+* test_double_line_clear
+* test_triple_line_clear
+* test_tetris_line_clear
+* test_partial_line_no_clear
+* test_perfect_clear
+* test_non_perfect_clear
+* test_is_empty_at
+* test_get_cell
+* test_get_cell_out_of_bounds
+* test_grid_reset
+[1m16/16 passed.
+[0m[4m
+
+res://test/unit/test_lock_delay.gd
+[0m* test_lock_delay_expires_after_500ms
+* test_lock_delay_reset_on_move
+* test_lock_delay_15_move_limit
+* test_lock_delay_cancel_and_restart
+* test_lock_delay_move_count_persists_after_cancel
+* test_lock_delay_inactive_by_default
+* test_lock_delay_full_reset
+[1m7/7 passed.
+[0m[4m
+
+res://test/unit/test_rotation.gd
+[0m* test_t_piece_rotates_cw
+* test_t_piece_rotates_ccw
+* test_i_piece_rotates_all_4_states
+* test_o_piece_does_not_rotate
+* test_wall_kick_right_wall
+* test_wall_kick_left_wall
+* test_i_piece_floor_kick
+* test_rotation_fails_when_trapped
+* test_ghost_position_lands_at_bottom
+[1m9/9 passed.
+[0m[4m
+
+res://test/unit/test_scoring.gd
+[0m* test_single_at_level_1
+* test_tetris_at_level_3
+* test_tspin_double_at_level_1
+* test_back_to_back_tetris
+* test_back_to_back_breaks
+* test_combo_scoring
+* test_hard_drop_scoring
+* test_soft_drop_scoring
+* test_level_progression
+* test_level_cap_at_15
+* test_perfect_clear_single
+* test_tspin_detection_3_corners
+* test_tspin_detection_marks_mini_when_front_not_both_filled
+* test_reset_restores_initial_state
+[1m14/14 passed.
+[0m
+
+
+
+[33m==============================================
+[0m[33m= Run Summary
+[0m[33m==============================================
+[0m
+Totals
+------
+Scripts               5
+Tests                53
+Passing Tests        53
+Asserts             114
+Time              0.432s
+
+
+[32m---- All tests passed! ----
+[0m
