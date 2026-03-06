@@ -10,6 +10,7 @@ const ClearParticlesScene = preload("res://scenes/particles/ClearParticles.tscn"
 const LockSparksScene = preload("res://scenes/particles/LockSparks.tscn")
 const HardDropImpactScene = preload("res://scenes/particles/HardDropImpact.tscn")
 const AmbientSparklesScene = preload("res://scenes/particles/AmbientSparkles.tscn")
+const LevelUpEffectScene = preload("res://scenes/particles/LevelUpEffect.tscn")
 
 # Fonts
 var _font: Font
@@ -22,6 +23,7 @@ var _font_bold: Font
 var game_logic: GameLogicScript
 var textures: Dictionary = {}
 var game_manager = null
+var show_ghost: bool = true
 var _floating_texts: Array = []
 
 # --- VFX State ---
@@ -138,6 +140,7 @@ func _process(delta: float) -> void:
 
 		if events.get("level_up", false):
 			SfxManager.play("level_up")
+			_spawn_level_up_effect()
 		if events.get("game_over", false):
 			SfxManager.play("game_over")
 			if game_manager != null:
@@ -494,6 +497,40 @@ func _setup_ambient_sparkles() -> void:
 
 
 # =============================================================================
+# LEVEL UP VFX
+# =============================================================================
+
+func _spawn_level_up_effect() -> void:
+	# Board center position (visible area only)
+	var play_top := Constants.BOARD_OFFSET.y + Constants.BUFFER_ROWS * Constants.CELL_SIZE
+	var play_h := Constants.VISIBLE_ROWS * Constants.CELL_SIZE
+	var board_w := Constants.COLS * Constants.CELL_SIZE
+	var center := Vector2(
+		Constants.BOARD_OFFSET.x + board_w * 0.5,
+		play_top + play_h * 0.5
+	)
+
+	# Particle burst
+	var particles := LevelUpEffectScene.instantiate()
+	particles.configure(center)
+	add_child(particles)
+
+	# "LEVEL UP!" floating text
+	_floating_texts.append({
+		"score_text": "",
+		"action_text": "LEVEL UP!",
+		"combo_text": "",
+		"b2b_text": "",
+		"position": Vector2(center.x, center.y),
+		"timer": 0.0,
+		"duration": Constants.FLOAT_DURATION,
+		"font_size": 48,
+		"color": Color(1.0, 0.85, 0.0),
+		"combo_count": -1,
+	})
+
+
+# =============================================================================
 # FLOATING TEXTS
 # =============================================================================
 
@@ -739,11 +776,12 @@ func _draw() -> void:
 		active_positions = game_logic.active_piece.get_block_positions()
 	var hard_drop_state := game_logic.get_hard_drop_visual_state()
 
-	var ghost_positions = game_logic.get_ghost_blocks()
-	for ghost_pos in ghost_positions:
-		if ghost_pos.y >= 0 and not ghost_pos in active_positions:
-			var pos = grid_to_screen(ghost_pos)
-			draw_texture(textures["ghost"], pos)
+	if show_ghost:
+		var ghost_positions = game_logic.get_ghost_blocks()
+		for ghost_pos in ghost_positions:
+			if ghost_pos.y >= 0 and not ghost_pos in active_positions:
+				var pos = grid_to_screen(ghost_pos)
+				draw_texture(textures["ghost"], pos)
 
 	# Active piece with glow — brighter than locked blocks
 	if game_logic.active_piece != null:
