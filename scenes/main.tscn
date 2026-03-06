@@ -7,6 +7,7 @@
 [ext_resource type="PackedScene" path="res://scenes/pause_menu.tscn" id="5_pause"]
 [ext_resource type="PackedScene" path="res://scenes/game_over_screen.tscn" id="6_gameover"]
 [ext_resource type="Script" path="res://scripts/background_manager.gd" id="7_bg_manager"]
+[ext_resource type="PackedScene" path="res://scenes/credits_screen.tscn" id="8_credits"]
 
 [sub_resource type="CanvasItemMaterial" id="CanvasItemMaterial_cg"]
 blend_mode = 3
@@ -30,6 +31,9 @@ visible = false
 visible = false
 
 [node name="GameOverScreen" parent="." unique_id=1576333213 instance=ExtResource("6_gameover")]
+visible = false
+
+[node name="CreditsScreen" parent="." instance=ExtResource("8_credits")]
 visible = false
 
 [node name="ColorGrading" type="CanvasLayer" parent="." unique_id=1158274193]

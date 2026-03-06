@@ -12,6 +12,7 @@ var hud: Control
 var title_screen: Control
 var pause_menu: CanvasLayer
 var game_over_screen: CanvasLayer
+var credits_screen: Control
 var final_score_label: Label
 var menu_button: Button
 var sfx_toggle: TextureButton
@@ -30,11 +31,27 @@ func _ready() -> void:
 	hud = $GameContent/HUD
 	pause_menu = $PauseMenu
 	game_over_screen = $GameOverScreen
+	credits_screen = $CreditsScreen
 
 	game_board.game_manager = self
 
 	var start_btn = title_screen.get_node("CenterContainer/PanelContainer/VBoxContainer/StartButton")
 	start_btn.pressed.connect(_on_start_pressed)
+
+	var credits_btn = title_screen.get_node("CenterContainer/PanelContainer/VBoxContainer/CreditsButton")
+	credits_btn.pressed.connect(_on_credits_pressed)
+
+	var back_btn = credits_screen.get_node("CenterContainer/PanelContainer/VBoxContainer/BackButton")
+	back_btn.pressed.connect(_back_to_menu_from_credits)
+
+	var music_link = credits_screen.get_node("CenterContainer/PanelContainer/VBoxContainer/MusicLink")
+	music_link.pressed.connect(_open_url.bind("https://fablefly-music.itch.io"))
+
+	var game_link = credits_screen.get_node("CenterContainer/PanelContainer/VBoxContainer/GameLink")
+	game_link.pressed.connect(_open_url.bind("https://tetr.io"))
+
+	var linkedin_link = credits_screen.get_node("CenterContainer/PanelContainer/VBoxContainer/LinkedInLink")
+	linkedin_link.pressed.connect(_open_url.bind("https://www.linkedin.com/in/neoju"))
 
 	var resume_btn = pause_menu.get_node("Control/CenterContainer/PanelContainer/VBoxContainer/ResumeButton")
 	resume_btn.pressed.connect(_resume)
@@ -199,9 +216,32 @@ func _show_title_screen() -> void:
 	menu_button.visible = false
 	pause_menu.hide()
 	game_over_screen.hide()
+	credits_screen.hide()
 	game_board.set_process(false)
 	hud.set_process(false)
 
+
+# =============================================================================
+# CREDITS
+# =============================================================================
+
+func _on_credits_pressed() -> void:
+	title_screen.hide()
+	credits_screen.show()
+
+
+func _back_to_menu_from_credits() -> void:
+	credits_screen.hide()
+	title_screen.show()
+
+
+func _open_url(url: String) -> void:
+	OS.shell_open(url)
+
+
+# =============================================================================
+# SETTINGS TOGGLES
+# =============================================================================
 
 func _on_sfx_toggled(is_on: bool) -> void:
 	SfxManager.enabled = is_on
