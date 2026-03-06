@@ -27,7 +27,7 @@ func _draw() -> void:
 	var hold_rect := Rect2(hold_panel.position, hold_panel.size)
 	var next_rect := Rect2(next_panel.position, next_panel.size)
 
-	# Borders are authored in ui_panel.tscn (Panel styleboxes), not drawn here.
+	# Borders are authored in hud.tscn (Panel styleboxes), not drawn here.
 
 	# Hold piece
 	if game_logic.hold_piece_type != "":

@@ -1,8 +1,6 @@
 [gd_scene format=3 uid="uid://blnt2wri44n1j"]
 
 [ext_resource type="FontFile" uid="uid://bxswyuvv0hqub" path="res://assets/fonts/monogram-extended.ttf" id="1_bold"]
-[ext_resource type="Texture2D" uid="uid://4lt7bw3vjpas" path="res://assets/ui/toggle_off.png" id="2_toggle_off"]
-[ext_resource type="Texture2D" uid="uid://clu8v5i8tr0l1" path="res://assets/ui/toggle_on.png" id="2_toggle_on"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_content_panel"]
 content_margin_left = 32.0
