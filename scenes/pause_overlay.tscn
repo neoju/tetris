@@ -1,11 +1,57 @@
-[gd_scene format=3]
+[gd_scene format=3 uid="uid://bb1pqej2aeu60"]
 
-[ext_resource type="FontFile" path="res://assets/fonts/monogram-extended.ttf" id="1_bold"]
+[ext_resource type="FontFile" uid="uid://bxswyuvv0hqub" path="res://assets/fonts/monogram-extended.ttf" id="1_bold"]
+[ext_resource type="Texture2D" uid="uid://4lt7bw3vjpas" path="res://assets/ui/toggle_off.png" id="2_toggle_off"]
+[ext_resource type="Texture2D" uid="uid://clu8v5i8tr0l1" path="res://assets/ui/toggle_on.png" id="2_toggle_on"]
 
-[node name="PauseOverlay" type="CanvasLayer"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_content_panel"]
+content_margin_left = 32.0
+content_margin_top = 28.0
+content_margin_right = 32.0
+content_margin_bottom = 28.0
+bg_color = Color(0.09, 0.09, 0.14, 0.9)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.3, 0.32, 0.45, 0.5)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_btn_normal"]
+bg_color = Color(0.11, 0.11, 0.17, 0.95)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.35, 0.38, 0.5, 0.7)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_btn_pressed"]
+bg_color = Color(0.06, 0.06, 0.1, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.2, 0.8, 1, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_btn_hover"]
+bg_color = Color(0.14, 0.16, 0.24, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.3, 0.7, 0.9, 0.85)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_btn_focus"]
+bg_color = Color(0.14, 0.16, 0.24, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.3, 0.7, 0.9, 0.85)
+
+[node name="PauseOverlay" type="CanvasLayer" unique_id=461559046]
 layer = 10
 
-[node name="Control" type="Control" parent="."]
+[node name="Control" type="Control" parent="." unique_id=1192284675]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -13,7 +59,7 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="Background" type="ColorRect" parent="Control"]
+[node name="Background" type="ColorRect" parent="Control" unique_id=1412161649]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -22,7 +68,7 @@ grow_horizontal = 2
 grow_vertical = 2
 color = Color(0, 0, 0, 0.7)
 
-[node name="CenterContainer" type="CenterContainer" parent="Control"]
+[node name="CenterContainer" type="CenterContainer" parent="Control" unique_id=422338412]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -30,31 +76,74 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="VBoxContainer" type="VBoxContainer" parent="Control/CenterContainer"]
+[node name="PanelContainer" type="PanelContainer" parent="Control/CenterContainer" unique_id=1432721102]
 layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_content_panel")
 
-[node name="PausedLabel" type="Label" parent="Control/CenterContainer/VBoxContainer"]
+[node name="VBoxContainer" type="VBoxContainer" parent="Control/CenterContainer/PanelContainer" unique_id=1149942389]
 layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="PausedLabel" type="Label" parent="Control/CenterContainer/PanelContainer/VBoxContainer" unique_id=1260551269]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.95, 0.7, 1)
 theme_override_fonts/font = ExtResource("1_bold")
-theme_override_colors/font_color = Color(1, 1, 1, 1)
 theme_override_font_sizes/font_size = 50
 text = "PAUSED"
 horizontal_alignment = 1
 
-[node name="Spacer" type="Control" parent="Control/CenterContainer/VBoxContainer"]
-custom_minimum_size = Vector2(0, 40)
+[node name="Spacer" type="Control" parent="Control/CenterContainer/PanelContainer/VBoxContainer" unique_id=1371918637]
+custom_minimum_size = Vector2(0, 20)
 layout_mode = 2
 
-[node name="ResumeButton" type="Button" parent="Control/CenterContainer/VBoxContainer"]
-custom_minimum_size = Vector2(200, 50)
+[node name="SfxRow" type="HBoxContainer" parent="Control/CenterContainer/PanelContainer/VBoxContainer" unique_id=1707375277]
 layout_mode = 2
+theme_override_constants/separation = 16
+alignment = 1
+
+[node name="SfxLabel" type="Label" parent="Control/CenterContainer/PanelContainer/VBoxContainer/SfxRow" unique_id=540465183]
+custom_minimum_size = Vector2(130, 0)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.5, 0.55, 0.65, 1)
+theme_override_fonts/font = ExtResource("1_bold")
+theme_override_font_sizes/font_size = 28
+text = "SFX"
+vertical_alignment = 1
+
+[node name="SfxToggle" type="TextureButton" parent="Control/CenterContainer/PanelContainer/VBoxContainer/SfxRow" unique_id=1273807323]
+custom_minimum_size = Vector2(72, 36)
+layout_mode = 2
+toggle_mode = true
+button_pressed = true
+texture_normal = ExtResource("2_toggle_off")
+texture_pressed = ExtResource("2_toggle_on")
+ignore_texture_size = true
+stretch_mode = 0
+
+[node name="ResumeButton" type="Button" parent="Control/CenterContainer/PanelContainer/VBoxContainer" unique_id=418634533]
+custom_minimum_size = Vector2(220, 54)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.75, 0.82, 0.95, 1)
+theme_override_colors/font_pressed_color = Color(0.2, 0.85, 1, 1)
+theme_override_colors/font_hover_color = Color(1, 1, 1, 1)
+theme_override_fonts/font = ExtResource("1_bold")
+theme_override_font_sizes/font_size = 28
+theme_override_styles/normal = SubResource("StyleBoxFlat_btn_normal")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_btn_pressed")
+theme_override_styles/hover = SubResource("StyleBoxFlat_btn_hover")
+theme_override_styles/focus = SubResource("StyleBoxFlat_btn_focus")
 text = "Resume"
-theme_override_font_sizes/font_size = 28
-theme_override_fonts/font = ExtResource("1_bold")
 
-[node name="QuitButton" type="Button" parent="Control/CenterContainer/VBoxContainer"]
-custom_minimum_size = Vector2(200, 50)
+[node name="QuitButton" type="Button" parent="Control/CenterContainer/PanelContainer/VBoxContainer" unique_id=659011406]
+custom_minimum_size = Vector2(220, 54)
 layout_mode = 2
-text = "Quit to Menu"
-theme_override_font_sizes/font_size = 28
+theme_override_colors/font_color = Color(0.75, 0.82, 0.95, 1)
+theme_override_colors/font_pressed_color = Color(0.2, 0.85, 1, 1)
+theme_override_colors/font_hover_color = Color(1, 1, 1, 1)
 theme_override_fonts/font = ExtResource("1_bold")
+theme_override_font_sizes/font_size = 28
+theme_override_styles/normal = SubResource("StyleBoxFlat_btn_normal")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_btn_pressed")
+theme_override_styles/hover = SubResource("StyleBoxFlat_btn_hover")
+theme_override_styles/focus = SubResource("StyleBoxFlat_btn_focus")
+text = "Quit to Menu"

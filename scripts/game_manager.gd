@@ -11,6 +11,7 @@ var pause_overlay: CanvasLayer
 var game_over_overlay: CanvasLayer
 var final_score_label: Label
 var menu_button: Button
+var sfx_toggle_pause: TextureButton
 
 
 func _ready() -> void:
@@ -22,22 +23,26 @@ func _ready() -> void:
 
 	game_board.game_manager = self
 
-	var start_btn = menu.get_node("CenterContainer/VBoxContainer/StartButton")
+	var start_btn = menu.get_node("CenterContainer/PanelContainer/VBoxContainer/StartButton")
 	start_btn.pressed.connect(_on_start_game)
 
-	var resume_btn = pause_overlay.get_node("Control/CenterContainer/VBoxContainer/ResumeButton")
+	var resume_btn = pause_overlay.get_node("Control/CenterContainer/PanelContainer/VBoxContainer/ResumeButton")
 	resume_btn.pressed.connect(_resume)
 
-	var quit_to_menu_btn = pause_overlay.get_node("Control/CenterContainer/VBoxContainer/QuitButton")
+	var quit_to_menu_btn = pause_overlay.get_node("Control/CenterContainer/PanelContainer/VBoxContainer/QuitButton")
 	quit_to_menu_btn.pressed.connect(_quit_to_menu_from_pause)
 
-	var play_again_btn = game_over_overlay.get_node("Control/CenterContainer/VBoxContainer/PlayAgainButton")
+	var play_again_btn = game_over_overlay.get_node("Control/CenterContainer/PanelContainer/VBoxContainer/PlayAgainButton")
 	play_again_btn.pressed.connect(_play_again)
 
-	var menu_btn = game_over_overlay.get_node("Control/CenterContainer/VBoxContainer/MenuButton")
+	var menu_btn = game_over_overlay.get_node("Control/CenterContainer/PanelContainer/VBoxContainer/MenuButton")
 	menu_btn.pressed.connect(_quit_to_menu_from_game_over)
 
-	final_score_label = game_over_overlay.get_node("Control/CenterContainer/VBoxContainer/FinalScoreLabel")
+	final_score_label = game_over_overlay.get_node("Control/CenterContainer/PanelContainer/VBoxContainer/FinalScoreLabel")
+
+	# SFX toggle
+	sfx_toggle_pause = pause_overlay.get_node("Control/CenterContainer/PanelContainer/VBoxContainer/SfxRow/SfxToggle")
+	sfx_toggle_pause.toggled.connect(_on_sfx_toggled)
 
 	# Create in-game menu button (hamburger ≡)
 	_create_menu_button()
@@ -138,3 +143,7 @@ func _show_menu() -> void:
 	game_over_overlay.hide()
 	game_board.set_process(false)
 	ui_panel.set_process(false)
+
+
+func _on_sfx_toggled(is_on: bool) -> void:
+	SfxManager.enabled = is_on

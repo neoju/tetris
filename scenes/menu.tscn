@@ -1,6 +1,52 @@
 [gd_scene format=3 uid="uid://blnt2wri44n1j"]
 
 [ext_resource type="FontFile" uid="uid://bxswyuvv0hqub" path="res://assets/fonts/monogram-extended.ttf" id="1_bold"]
+[ext_resource type="Texture2D" uid="uid://4lt7bw3vjpas" path="res://assets/ui/toggle_off.png" id="2_toggle_off"]
+[ext_resource type="Texture2D" uid="uid://clu8v5i8tr0l1" path="res://assets/ui/toggle_on.png" id="2_toggle_on"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_content_panel"]
+content_margin_left = 32.0
+content_margin_top = 28.0
+content_margin_right = 32.0
+content_margin_bottom = 28.0
+bg_color = Color(0.09, 0.09, 0.14, 0.85)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.3, 0.32, 0.45, 0.5)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_btn_normal"]
+bg_color = Color(0.11, 0.11, 0.17, 0.95)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.35, 0.38, 0.5, 0.7)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_btn_pressed"]
+bg_color = Color(0.06, 0.06, 0.1, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.2, 0.8, 1, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_btn_hover"]
+bg_color = Color(0.14, 0.16, 0.24, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.3, 0.7, 0.9, 0.85)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_btn_focus"]
+bg_color = Color(0.14, 0.16, 0.24, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.3, 0.7, 0.9, 0.85)
 
 [node name="Menu" type="Control" unique_id=1570330956]
 layout_mode = 3
@@ -27,10 +73,15 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="VBoxContainer" type="VBoxContainer" parent="CenterContainer" unique_id=1494303973]
+[node name="PanelContainer" type="PanelContainer" parent="CenterContainer" unique_id=1731637723]
 layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_content_panel")
 
-[node name="TitleLabel" type="Label" parent="CenterContainer/VBoxContainer" unique_id=858225926]
+[node name="VBoxContainer" type="VBoxContainer" parent="CenterContainer/PanelContainer" unique_id=1494303973]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="TitleLabel" type="Label" parent="CenterContainer/PanelContainer/VBoxContainer" unique_id=858225926]
 layout_mode = 2
 theme_override_colors/font_color = Color(1, 1, 1, 1)
 theme_override_fonts/font = ExtResource("1_bold")
@@ -38,13 +89,20 @@ theme_override_font_sizes/font_size = 54
 text = "TETRIS"
 horizontal_alignment = 1
 
-[node name="Spacer" type="Control" parent="CenterContainer/VBoxContainer" unique_id=764208615]
-custom_minimum_size = Vector2(0, 40)
+[node name="Spacer" type="Control" parent="CenterContainer/PanelContainer/VBoxContainer" unique_id=764208615]
+custom_minimum_size = Vector2(0, 24)
 layout_mode = 2
 
-[node name="StartButton" type="Button" parent="CenterContainer/VBoxContainer" unique_id=1803818290]
-custom_minimum_size = Vector2(200, 50)
+[node name="StartButton" type="Button" parent="CenterContainer/PanelContainer/VBoxContainer" unique_id=1803818290]
+custom_minimum_size = Vector2(220, 54)
 layout_mode = 2
-theme_override_font_sizes/font_size = 28
+theme_override_colors/font_color = Color(0.75, 0.82, 0.95, 1)
+theme_override_colors/font_pressed_color = Color(0.2, 0.85, 1, 1)
+theme_override_colors/font_hover_color = Color(1, 1, 1, 1)
 theme_override_fonts/font = ExtResource("1_bold")
+theme_override_font_sizes/font_size = 28
+theme_override_styles/normal = SubResource("StyleBoxFlat_btn_normal")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_btn_pressed")
+theme_override_styles/hover = SubResource("StyleBoxFlat_btn_hover")
+theme_override_styles/focus = SubResource("StyleBoxFlat_btn_focus")
 text = "Start Game"
