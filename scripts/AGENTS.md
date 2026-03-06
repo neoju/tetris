@@ -29,7 +29,7 @@
 | `game_board.gd` | 333 | Node2D coordinator: `_draw()` grid/pieces/ghost/clear-overlay/border-glow/starfall, event→SFX routing, delegates VFX state to BoardVfx, text to FloatingTextRenderer, particles to ParticleEffects |
 | `floating_text_renderer.gd` | 249 | Node2D child of GameBoard: spawns/animates/draws floating score/action/combo text |
 | `particle_effects.gd` | 233 | Node2D child of GameBoard: line clear bursts, lock sparks, hard drop impact, combo fire/lightning, level up particles |
-| `game_manager.gd` | 217 | State machine (MENU/COUNTDOWN/PLAYING/PAUSED/GAME_OVER), wires UI ↔ GameBoard, viewport centering, background selection. Ghost toggle wiring |
+| `game_manager.gd` | 255 | State machine (MENU/COUNTDOWN/PLAYING/PAUSED/GAME_OVER), wires UI ↔ GameBoard, viewport centering, background selection. Ghost toggle, credits screen with URL links |
 | `sfx_manager.gd` | 35 | Autoload singleton, AudioStreamPlayer pool, `play(name)` API |
 | `music_manager.gd` | 78 | Autoload singleton, random track per game, play/stop/pause/toggle API |
 | `background_manager.gd` | 109 | CanvasLayer -1, hardcoded manifest of 24 background sets, random selection, cover-mode parallax shader layers, viewport resize |
@@ -61,6 +61,7 @@ game_board.gd ←── thin coordinator
 
 game_manager.gd ──→ game_board.game_logic (runtime reference)
 game_manager.gd ──→ background_manager.gd (select_random on new game)
+game_manager.gd ──→ credits_screen (show/hide, URL links via OS.shell_open)
 ui_panel.gd ──→ game_logic (via setter)
 piece_overlay.gd ──→ tetromino_data.gd + game_logic (reads hold/next)
 sfx_manager.gd ──→ constants.gd (pool size, volume)

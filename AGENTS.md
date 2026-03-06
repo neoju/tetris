@@ -33,6 +33,7 @@ Tetris Guideline-compliant game in Godot 4.6 / GDScript. Pure logic classes (Ref
 | Add sounds | `scripts/sfx_manager.gd` + `assets/sfx/` | Autoload singleton, pool of 4 players |
 | Change backgrounds | `scripts/background_manager.gd` + `assets/backgrounds/` | 24 sets, random per game, parallax shader |
 | Change music | `scripts/music_manager.gd` + `assets/music/` | Autoload singleton, random track per game, looping |
+| Edit credits screen | `scenes/credits_screen.tscn` + `scripts/game_manager.gd` | Links to FableFly Music, TETR.IO, author LinkedIn |
 | Scene composition | `scenes/main.tscn` | Root=Main, script=game_manager.gd |
 | Run tests | CLI command below | GUT headless |
 | Regenerate assets | `tools/generate_blocks.py`, `tools/generate_sfx.py` | Python, PIL/stdlib |
@@ -54,7 +55,7 @@ project.godot → scenes/main.tscn → GameManager (state machine: MENU/COUNTDOW
                                       │     │           ├── Scoring, LockDelay, InputHandler
                                       │     │           └── returns event Dictionary per tick
                                       │     └── HUD → PieceOverlay (hold + next 3)
-                                      ├── TitleScreen / PauseMenu / GameOverScreen
+                                      ├── TitleScreen / PauseMenu / GameOverScreen / CreditsScreen
                                       ├── SfxManager (autoload singleton)
                                       └── MusicManager (autoload singleton)
 ```
@@ -109,5 +110,5 @@ godot --headless --path . --export-release "Web" build/index.html
 - No CI/CD pipeline — tests run locally only
 - Web export preset configured in `export_presets.cfg` (Emscripten, custom HTML shell, thread pools configured)
 - `.sisyphus/` contains project planning artifacts — not runtime code
-- Test evidence shows 68/68 tests passing at last recorded run
+- Test evidence shows 80/80 tests passing at last recorded run
 - Constants centralized in `scripts/constants.gd` — check there before adding magic numbers
