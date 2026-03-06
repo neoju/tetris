@@ -26,6 +26,7 @@ var level: int = 1
 var lines_cleared: int = 0
 var combo_count: int = -1
 var back_to_back: bool = false
+var back_to_back_count: int = 0
 var combo_grace_pieces: int = 0
 
 
@@ -54,6 +55,7 @@ func process_placement(
 
 	if qualifies_for_b2b and back_to_back:
 		line_clear_points = int(floor(line_clear_points * 1.5))
+		back_to_back_count += 1
 
 	var combo_bonus := 0
 	if lines > 0:
@@ -78,9 +80,12 @@ func process_placement(
 	level = mini(int(lines_cleared / 10.0) + 1, 15)
 
 	if qualifies_for_b2b:
+		if not back_to_back:
+			back_to_back_count = 1
 		back_to_back = true
 	elif lines > 0:
 		back_to_back = false
+		back_to_back_count = 0
 
 
 func detect_tspin(
@@ -139,6 +144,7 @@ func reset() -> void:
 	lines_cleared = 0
 	combo_count = -1
 	back_to_back = false
+	back_to_back_count = 0
 	combo_grace_pieces = 0
 
 

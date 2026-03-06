@@ -384,6 +384,7 @@ func _lock_piece() -> Dictionary:
 	events["piece_locked"] = true
 	events["level_up"] = scoring.level > level_before
 	events["combo_count"] = scoring.combo_count
+	events["back_to_back_count"] = scoring.back_to_back_count
 	events["is_tspin"] = tspin["is_tspin"]
 	events["is_tspin_mini"] = tspin["is_mini"]
 	events["is_back_to_back"] = b2b_before and lines > 0 and (lines == 4 or tspin["is_tspin"])
