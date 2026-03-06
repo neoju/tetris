@@ -1,0 +1,42 @@
+EVIDENCE: B2B Counter Reset Verification
+==========================================
+
+Task: Add B2B Count Tracking to Scoring + Event Propagation (Task 1)
+Status: COMPLETED ✓
+
+Reset Behavior Verified:
+
+1. RESET METHOD (scoring.gd:141-148)
+   - Resets back_to_back to false
+   - Resets back_to_back_count to 0
+   - Called on game start and game reset
+   - Test: test_reset_restores_back_to_back_count_to_zero ✓ PASSED
+
+2. BREAK ON NON-QUALIFYING CLEAR (scoring.gd:86-88)
+   - When lines > 0 AND not (lines == 4 OR is_tspin):
+     * Sets back_to_back = false
+     * Sets back_to_back_count = 0
+   - Test: test_back_to_back_count_resets_on_single_clear ✓ PASSED
+   - Test: test_back_to_back_count_resets_on_double_clear ✓ PASSED
+   - Test: test_back_to_back_count_resets_on_triple_clear ✓ PASSED
+
+3. NO RESET ON NO-CLEAR (scoring.gd:65-68)
+   - When lines == 0:
+     * Combo grace mechanics apply (not B2B related)
+     * back_to_back remains unchanged
+     * back_to_back_count remains unchanged
+   - Test: test_back_to_back_count_does_not_reset_on_no_clear ✓ PASSED
+
+4. NO RESET ON QUALIFYING CLEAR (scoring.gd:82-85)
+   - When qualifies_for_b2b (lines == 4 OR is_tspin):
+     * If B2B was already true: counter increments
+     * If B2B was false: counter set to 1 (new sequence)
+   - Test: test_back_to_back_count_increments_on_consecutive_tetris ✓ PASSED
+   - Test: test_back_to_back_count_increments_on_consecutive_tspins ✓ PASSED
+   - Test: test_back_to_back_count_increments_on_mixed_qualifying_clears ✓ PASSED
+
+Edge Cases:
+- Multiple B2B sequences: Counter properly resets between sequences ✓ PASSED
+  Test: test_back_to_back_count_multiple_b2b_sequences ✓
+
+All reset logic verified and passing tests.

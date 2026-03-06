@@ -1,0 +1,49 @@
+EVIDENCE: GUT Test Suite Pass
+==============================
+
+Task: Add B2B Count Tracking to Scoring + Event Propagation (Task 1)
+Status: COMPLETED ✓
+
+Command Executed:
+  timeout 60 godot --headless --path . -d -s addons/gut/gut_cmdln.gd \
+    -gdir=res://test/unit/ -ginclude_subdirs -gexit
+
+Results:
+--------
+Scripts               7
+Tests                80
+Passing Tests        80
+Asserts             214
+Time              0.405s
+Exit Code          0
+
+Test Summary by File:
+- test_b2b_counter.gd:     12/12 PASSED (NEW)
+- test_bag.gd:              7/7 PASSED
+- test_game_logic.gd:      13/13 PASSED
+- test_grid.gd:            16/16 PASSED
+- test_lock_delay.gd:       7/7 PASSED
+- test_rotation.gd:        11/11 PASSED
+- test_scoring.gd:         14/14 PASSED
+
+New Tests:
+----------
+✓ test_back_to_back_count_starts_at_zero
+✓ test_reset_restores_back_to_back_count_to_zero
+✓ test_back_to_back_count_set_to_1_on_first_tetris
+✓ test_back_to_back_count_set_to_1_on_first_tspin
+✓ test_back_to_back_count_increments_on_consecutive_tetris
+✓ test_back_to_back_count_increments_on_consecutive_tspins
+✓ test_back_to_back_count_increments_on_mixed_qualifying_clears
+✓ test_back_to_back_count_resets_on_single_clear
+✓ test_back_to_back_count_resets_on_double_clear
+✓ test_back_to_back_count_resets_on_triple_clear
+✓ test_back_to_back_count_does_not_reset_on_no_clear
+✓ test_back_to_back_count_multiple_b2b_sequences
+
+No Regressions:
+- All 68 existing tests continue to pass
+- No test failures
+- No compiler warnings related to new code
+
+Verification Passed: YES ✓

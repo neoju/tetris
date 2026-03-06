@@ -1,0 +1,6 @@
+func _ready() -> void:
+func clear() -> void:
+func update_display(delta: float) -> void:
+func spawn(events: Dictionary) -> void:
+func spawn_level_up() -> void:
+func _draw() -> void:

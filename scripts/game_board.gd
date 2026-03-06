@@ -53,6 +53,10 @@ func _ready() -> void:
 	game_logic.start_game()
 
 
+func get_left_panel_stats() -> Dictionary:
+	return _left_panel.get_stats()
+
+
 func clear_floating_texts() -> void:
 	_text_renderer.clear()
 	_left_panel.clear()

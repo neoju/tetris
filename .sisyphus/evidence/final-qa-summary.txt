@@ -1,0 +1,87 @@
+# Final QA Summary - Left Panel Persistent Counters
+
+**Date:** 2026-03-06
+**Commits:** 659b943, 3d58e50
+
+## Implementation Summary
+
+### Files Modified
+1. **scripts/left_panel_display.gd** (179→85 lines, -94 lines)
+   - Removed: transient display logic (timer, fade, action labels)
+   - Added: persistent counter state and update methods
+   
+2. **scripts/game_board.gd** (+18 lines)
+   - Added: LeftPanelDisplay as second child renderer
+   - Preserved: FloatingTextRenderer (dual system)
+   - Wired: combo/B2B counter updates on line clear events
+
+### Functionality Delivered
+✓ Persistent combo counter (shows "2 COMBO", "3 COMBO"... while active)
+✓ Persistent B2B counter (shows "B2B x1", "B2B x2"... while active)
+✓ Dual renderer system (floating text + left panel both active)
+✓ Proper state management (updates and clears)
+✓ Draw order preserved (text → left panel → particles)
+
+## QA Results
+
+### Automated Checks ✓
+- **Parse check:** Clean (no errors)
+- **Test suite:** 80/80 tests pass (214 assertions, 0.411s)
+- **Coverage:** 7 test scripts, all passing
+
+### Manual Code Review ✓
+**left_panel_display.gd:**
+- ✓ No timers or animation logic (persistent display)
+- ✓ Conditional rendering based on count thresholds
+- ✓ Display rules: B2B when > 0, combo when >= 1 (shown as count+1)
+- ✓ Right-aligned text using HORIZONTAL_ALIGNMENT_RIGHT
+- ✓ Font loaded with FontVariation (embolden 0.5)
+- ✓ Helper function _get_combo_color() for intensity colors
+
+**game_board.gd:**
+- ✓ LeftPanelDisplayScript preload added (line 8)
+- ✓ _left_panel variable declared (line 18)
+- ✓ Instantiation and add_child() correct (lines 46-47)
+- ✓ Clear call in clear_floating_texts() (line 58)
+- ✓ Update logic in line clear handler (lines 139-152)
+- ✓ _text_renderer preserved and unchanged (9 references)
+- ✓ No invalid spawn() calls to left panel (method doesn't exist)
+
+### Logic Verification ✓
+**Event Propagation Chain:**
+1. scoring.gd tracks back_to_back_count (lines 29, 58, 84, 88, 147) ✓
+2. game_logic.gd includes in events dict (line 387) ✓
+3. game_board.gd consumes events and updates left_panel (lines 140-141) ✓
+
+**Update Logic:**
+- Combo >= 1 → update_combo() → displays "2 COMBO", "3 COMBO"... ✓
+- Combo == -1 → clear_combo() → removes display ✓
+- Combo == 0 → no change (first line clear, no combo yet) ✓
+- B2B > 0 → update_b2b() → displays "B2B x1", "B2B x2"... ✓
+- B2B == 0 AND lines_cleared > 0 → clear_b2b() → removes display ✓
+
+### Pattern Compliance ✓
+- ✓ No class_name on Node rendering script (follows convention)
+- ✓ Uses preload() for dependencies
+- ✓ Typed GDScript throughout
+- ✓ Snake_case naming
+- ✓ Tab indentation
+- ✓ Section headers with === blocks
+- ✓ No signals for game events (event dictionary pattern)
+
+### Edge Cases Handled ✓
+- ✓ Simultaneous B2B + combo display (y_cursor accumulation)
+- ✓ Combo == 0 (first clear) doesn't show text
+- ✓ B2B == 0 with no lines cleared doesn't clear display
+- ✓ Game reset clears both counters
+
+## Known Limitations / Notes
+- Visual QA deferred (headless environment, no manual gameplay test)
+- UID warnings in scenes/particles/*.tscn (pre-existing, unrelated)
+- credits_screen.tscn typo fix included in commits (unrelated change)
+
+## Recommendation
+✅ **APPROVE FOR PRODUCTION**
+
+All automated checks pass, code review confirms correct logic, no regressions detected.
+Visual confirmation recommended on first launch, but implementation is sound.

@@ -14,6 +14,7 @@ var pause_menu: CanvasLayer
 var game_over_screen: CanvasLayer
 var credits_screen: Control
 var final_score_label: Label
+var stats_label: Label
 var menu_button: Button
 var sfx_toggle: TextureButton
 var music_toggle: TextureButton
@@ -66,6 +67,7 @@ func _ready() -> void:
 	menu_btn.pressed.connect(_quit_to_menu_from_game_over)
 
 	final_score_label = game_over_screen.get_node("Control/CenterContainer/PanelContainer/VBoxContainer/FinalScoreLabel")
+	stats_label = game_over_screen.get_node("Control/CenterContainer/PanelContainer/VBoxContainer/StatsLabel")
 
 	sfx_toggle = pause_menu.get_node("Control/CenterContainer/PanelContainer/VBoxContainer/SfxRow/SfxToggle")
 	sfx_toggle.toggled.connect(_on_sfx_toggled)
@@ -175,8 +177,40 @@ func on_game_over(final_score: int) -> void:
 	game_board.set_process(false)
 	hud.set_process(false)
 	final_score_label.text = "Score: " + str(final_score)
+	stats_label.text = _build_stats_text()
 	game_over_screen.show()
 	MusicManager.stop()
+
+
+func _build_stats_text() -> String:
+	var scoring: Scoring = game_board.game_logic.scoring
+	var panel_stats: Dictionary = game_board.get_left_panel_stats()
+	var combo_stats: Dictionary = panel_stats.get("combo_stats", {})
+	var b2b_total: int = panel_stats.get("b2b_total", 0)
+
+	var lines: Array[String] = []
+	lines.append("Level: " + str(scoring.level) + "  |  Lines: " + str(scoring.lines_cleared))
+	lines.append("")
+
+	# Combo stats — ALL levels (sorted ascending), not just top 7
+	var levels: Array = combo_stats.keys()
+	levels.sort()
+	if levels.size() > 0:
+		var combo_parts: Array[String] = []
+		for level in levels:
+			var count: int = combo_stats[level]
+			if count > 0:
+				combo_parts.append(str(count) + "x C" + str(level))
+		if combo_parts.size() > 0:
+			lines.append("-- Combos --")
+			lines.append("  ".join(combo_parts))
+			lines.append("")
+
+	# B2B total
+	if b2b_total > 0:
+		lines.append("Back-to-Back: " + str(b2b_total))
+
+	return "\n".join(lines)
 
 
 func _play_again() -> void:

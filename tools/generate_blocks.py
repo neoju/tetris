@@ -13,15 +13,15 @@ OUTPUT_DIR = os.path.join(os.path.dirname(__file__), "..", "assets", "blocks")
 # Block size
 BLOCK_SIZE = 32
 
-# Color definitions (Tetris Guideline standard colors)
+# Color definitions (dimmed from Tetris Guideline standard)
 COLORS = {
-    "cyan": "#00F0F0",  # I-piece
-    "blue": "#0000FF",  # J-piece
-    "orange": "#FFA500",  # L-piece
-    "yellow": "#FFFF00",  # O-piece
-    "green": "#00FF00",  # S-piece
-    "purple": "#800080",  # T-piece
-    "red": "#FF0000",  # Z-piece
+    "cyan": "#00B0B0",  # I-piece
+    "blue": "#0000C0",  # J-piece
+    "orange": "#C07800",  # L-piece
+    "yellow": "#C0C000",  # O-piece
+    "green": "#00B000",  # S-piece
+    "purple": "#600060",  # T-piece
+    "red": "#C00000",  # Z-piece
 }
 
 

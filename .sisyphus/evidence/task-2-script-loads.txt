@@ -1,0 +1,12 @@
+Godot Engine v4.6.1.stable.arch_linux.14d19694e - https://godotengine.org
+
+WARNING: res://scenes/particles/CountdownEffect.tscn:3 - ext_resource, invalid UID: uid://countdown_effect_gd - using text path instead: res://scenes/particles/CountdownEffect.gd
+     at: load (scene/resources/resource_format_text.cpp:500)
+WARNING: res://scenes/particles/LevelUpEffect.tscn:3 - ext_resource, invalid UID: uid://level_up_effect_gd - using text path instead: res://scenes/particles/LevelUpEffect.gd
+     at: load (scene/resources/resource_format_text.cpp:500)
+WARNING: res://scenes/particles/ClearParticles.tscn:3 - ext_resource, invalid UID: uid://clear_particles_gd - using text path instead: res://scenes/particles/ClearParticles.gd
+     at: load (scene/resources/resource_format_text.cpp:500)
+WARNING: res://scenes/particles/LockSparks.tscn:3 - ext_resource, invalid UID: uid://lock_sparks_gd - using text path instead: res://scenes/particles/LockSparks.gd
+     at: load (scene/resources/resource_format_text.cpp:500)
+WARNING: res://scenes/particles/HardDropImpact.tscn:3 - ext_resource, invalid UID: uid://hard_drop_impact_gd - using text path instead: res://scenes/particles/HardDropImpact.gd
+     at: load (scene/resources/resource_format_text.cpp:500)

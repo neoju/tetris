@@ -1,0 +1,35 @@
+TASK 3: Add Left Panel Constants to constants.gd
+================================================
+
+VERIFICATION RESULTS
+====================
+
+1. File Modified: scripts/constants.gd
+   - Lines 72-84: NEW LEFT PANEL DISPLAY section added
+   - Section follows existing `# ===...===` comment block format
+   - All 10 constants declared with correct types and values
+
+2. Constants Added (verified):
+   ✓ const LEFT_PANEL_X_RIGHT: float = 72.0
+   ✓ const LEFT_PANEL_Y_START: float = 250.0
+   ✓ const LEFT_PANEL_HOLD_DURATION: float = 0.5
+   ✓ const LEFT_PANEL_FADE_DURATION: float = 1.5
+   ✓ const LEFT_PANEL_TOTAL_DURATION: float = 2.0
+   ✓ const LEFT_PANEL_TEXT_WIDTH: float = 72.0
+   ✓ const LEFT_PANEL_ACTION_FONT_SIZE: int = 28
+   ✓ const LEFT_PANEL_COMBO_FONT_SIZE: int = 36
+   ✓ const LEFT_PANEL_B2B_FONT_SIZE: int = 20
+   ✓ const LEFT_PANEL_LINE_GAP: float = 6.0
+
+3. Godot Load Test: PASSED
+   - Command: godot --headless --path . --quit-after 2
+   - Result: No parse errors (only expected UID warnings)
+   - File is valid GDScript
+
+4. Value Verification:
+   - LEFT_PANEL_X_RIGHT = 72.0 (BOARD_OFFSET.x 80 - 8 = 72 ✓)
+   - LEFT_PANEL_Y_START = 250.0 (matches design spec ✓)
+   - Animation timing: 0.5s hold + 1.5s fade = 2.0s total ✓
+
+STATUS: COMPLETE
+All requirements met. Ready for next task.
