@@ -10,7 +10,7 @@ Tetris Guideline-compliant game in Godot 4.6 / GDScript. Pure logic classes (Ref
 ## STRUCTURE
 ```
 ./
-├── scripts/         # Core game logic + rendering (15 .gd files) — SEE scripts/AGENTS.md
+├── scripts/         # Core game logic + rendering (18 .gd files) — SEE scripts/AGENTS.md
 ├── scenes/          # .tscn scene files (main, board, HUD, screens, particles)
 │   └── particles/   # CPUParticles2D effects (4 scenes + 4 scripts)
 ├── test/unit/       # GUT unit tests (6 files) — SEE test/unit/AGENTS.md
@@ -23,7 +23,7 @@ Tetris Guideline-compliant game in Godot 4.6 / GDScript. Pure logic classes (Ref
 | Task | Location | Notes |
 |------|----------|-------|
 | Change game rules | `scripts/game_logic.gd` | Pure RefCounted, returns event dict |
-| Change visuals/VFX | `scripts/game_board.gd` | 766 lines, `_draw()` based rendering |
+| Change visuals/VFX | `scripts/game_board.gd` | 333-line coordinator; VFX state in `board_vfx.gd`, text in `floating_text_renderer.gd`, particles in `particle_effects.gd` |
 | Add/change piece data | `scripts/tetromino_data.gd` + `wall_kick_data.gd` | Y-values NEGATED from wiki |
 | Modify scoring | `scripts/scoring.gd` | T-spin 3-corner rule, B2B, combos |
 | Change input timing | `scripts/input_handler.gd` | DAS=0.167s, ARR=0.033s |
@@ -38,7 +38,10 @@ Tetris Guideline-compliant game in Godot 4.6 / GDScript. Pure logic classes (Ref
 ### Runtime Flow
 ```
 project.godot → scenes/main.tscn → GameManager (state machine: MENU/PLAYING/PAUSED/GAME_OVER)
-                                      ├── GameBoard (Node2D, rendering + VFX)
+                                      ├── GameBoard (Node2D, thin coordinator)
+                                      │     ├── BoardVfx (RefCounted, VFX state)
+                                      │     ├── FloatingTextRenderer (Node2D child, text)
+                                      │     ├── ParticleEffects (Node2D child, particles)
                                       │     └── GameLogic (RefCounted, pure logic)
                                       │           ├── Grid, Piece, BagRandomizer
                                       │           ├── Scoring, LockDelay, InputHandler
@@ -61,7 +64,7 @@ project.godot → scenes/main.tscn → GameManager (state machine: MENU/PLAYING/
 - Coordinate system: Y-positive = DOWN (Godot convention). Wiki SRS values Y-negated.
 - Grid: rows 0-3 hidden buffer (spawn zone), rows 4-23 visible. 10 columns.
 - Cell storage: `""` = empty, piece type string (`"I"`,`"J"`,`"L"`,`"O"`,`"S"`,`"T"`,`"Z"`) = filled
-- `class_name` on most scripts EXCEPT: game_board, sfx_manager, ui_panel, piece_overlay
+- `class_name` on most scripts EXCEPT: game_board, sfx_manager, ui_panel, piece_overlay, floating_text_renderer, particle_effects
 - Section headers use `# === ... ===` comment blocks
 - Typed GDScript: explicit types on vars, params, return values
 - Naming: snake_case functions/vars, PascalCase class_name, UPPER_SNAKE constants

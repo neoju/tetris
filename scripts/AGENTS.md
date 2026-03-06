@@ -1,6 +1,6 @@
 # scripts/ — Core Game Logic & Rendering
 
-15 GDScript files. Pure logic (RefCounted) separated from Node rendering layer.
+18 GDScript files. Pure logic (RefCounted) separated from Node rendering layer.
 
 ## SCRIPT CATALOG
 
@@ -15,6 +15,7 @@
 | `input_handler.gd` | 120 | DAS/ARR implementation, returns action dict to GameLogic |
 | `lock_delay.gd` | 40 | Lock timer with move-count reset (0.5s, max 15 moves) |
 | `constants.gd` | 64 | All magic numbers: grid sizes, timing, VFX, input, audio |
+| `board_vfx.gd` | 151 | VFX state: clear animation timer/data, screen shake, border glow. No rendering. |
 
 ### Static Data (no extends)
 | Script | Lines | Purpose |
@@ -25,7 +26,9 @@
 ### Node-Based (rendering/UI/audio)
 | Script | Lines | Purpose |
 |--------|-------|---------|
-| `game_board.gd` | 766 | Node2D renderer: `_draw()`, VFX, particles, clear animation, event consumption. `show_ghost` toggle |
+| `game_board.gd` | 333 | Node2D coordinator: `_draw()` grid/pieces/ghost/clear-overlay/border-glow/starfall, event→SFX routing, delegates VFX state to BoardVfx, text to FloatingTextRenderer, particles to ParticleEffects |
+| `floating_text_renderer.gd` | 249 | Node2D child of GameBoard: spawns/animates/draws floating score/action/combo text |
+| `particle_effects.gd` | 233 | Node2D child of GameBoard: line clear bursts, lock sparks, hard drop impact, combo fire/lightning, level up particles |
 | `game_manager.gd` | 149 | State machine (MENU/PLAYING/PAUSED/GAME_OVER), wires UI ↔ GameBoard. Ghost toggle wiring |
 | `sfx_manager.gd` | 35 | Autoload singleton, AudioStreamPlayer pool, `play(name)` API |
 | `ui_panel.gd` | 33 | HUD (scene: `hud.tscn`): score/level/lines labels, wires PieceOverlay |
@@ -33,8 +36,15 @@
 
 ## DEPENDENCY GRAPH
 ```
-game_board.gd
+game_board.gd ←── thin coordinator
 ├── constants.gd
+├── board_vfx.gd (RefCounted) ←── VFX state
+│   └── constants.gd
+├── floating_text_renderer.gd (Node2D child) ←── text rendering
+│   └── constants.gd
+├── particle_effects.gd (Node2D child) ←── particle spawning
+│   ├── constants.gd
+│   └── tetromino_data.gd
 ├── game_logic.gd ←── core hub
 │   ├── grid.gd
 │   ├── piece.gd
@@ -45,8 +55,7 @@ game_board.gd
 │   ├── lock_delay.gd
 │   ├── input_handler.gd
 │   └── tetromino_data.gd
-├── grid.gd
-└── tetromino_data.gd
+└── grid.gd (direct ref for _draw)
 
 game_manager.gd ──→ game_board.game_logic (runtime reference)
 ui_panel.gd ──→ game_logic (via setter)
@@ -81,17 +90,14 @@ sfx_manager.gd ──→ constants.gd (pool size, volume)
 ```
 
 ## COMPLEXITY HOTSPOTS
-1. **game_board.gd** (766 lines) — All rendering + VFX in one file. Key sections:
-   - `_process()`: event consumption, clear animation state machine
-   - `_draw()`: immediate-mode board/piece/ghost/floating text rendering
-   - `_start_clear_animation()` / `_update_clear_anim()`: deferred clear protocol
-2. **game_logic.gd** (423 lines) — Core loop. Key sections:
+1. **game_logic.gd** (423 lines) — Core loop. Key sections:
    - `update(delta)`: input → gravity → lock → events
    - `_lock_piece()`: placement, scoring, T-spin detection, pending_clear
    - `_begin_hard_drop()` / `_update_hard_drop_animation()`: visual hard drop
 
 ## CONVENTIONS (scripts-specific)
 - RefCounted logic classes: always use `class_name`, always `preload().new()`
-- Node scripts without `class_name`: game_board, sfx_manager, ui_panel, piece_overlay
+- Node scripts without `class_name`: game_board, sfx_manager, ui_panel, piece_overlay, floating_text_renderer, particle_effects
 - Constants accessed via `Constants.SYMBOL` (class_name reference, no instantiation needed)
 - All wall kick / shape data: Y-values negated from Tetris wiki (Godot Y+ = down)
+- GameBoard child nodes (FloatingTextRenderer, ParticleEffects) created via `preload().new()` + `add_child()` in `_ready()` — draw order is tree order
