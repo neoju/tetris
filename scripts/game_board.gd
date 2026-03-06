@@ -11,6 +11,8 @@ const LockSparksScene = preload("res://scenes/particles/LockSparks.tscn")
 const HardDropImpactScene = preload("res://scenes/particles/HardDropImpact.tscn")
 const AmbientSparklesScene = preload("res://scenes/particles/AmbientSparkles.tscn")
 const LevelUpEffectScene = preload("res://scenes/particles/LevelUpEffect.tscn")
+const ComboFireEffectScene = preload("res://scenes/particles/ComboFireEffect.tscn")
+const ComboLightningEffectScene = preload("res://scenes/particles/ComboLightningEffect.tscn")
 
 # Fonts
 var _font: Font
@@ -33,6 +35,11 @@ var _shake_timer: float = 0.0
 var _original_position: Vector2 = Vector2.ZERO
 var _border_glow: float = 0.0
 var _border_glow_color: Color = Color.WHITE
+
+# --- Combo VFX ---
+var _combo_fire: CPUParticles2D = null
+var _combo_lightning_left: CPUParticles2D = null
+var _combo_lightning_right: CPUParticles2D = null
 
 
 func _ready() -> void:
@@ -65,7 +72,6 @@ func _ready() -> void:
 	_font_bold = font_bold_variation
 
 	_original_position = position
-	_setup_ambient_sparkles()
 
 	game_logic = GameLogicScript.new()
 	game_logic.start_game()
@@ -76,6 +82,7 @@ func clear_floating_texts() -> void:
 	_border_glow = 0.0
 	_shake_intensity = 0.0
 	position = _original_position
+	_force_clear_combo_vfx()
 
 func _process(delta: float) -> void:
 	# Update VFX timers regardless of game state
@@ -130,6 +137,16 @@ func _process(delta: float) -> void:
 
 			# Lock impact sparks on every piece lock
 			_spawn_lock_sparks(events)
+
+			# Update combo streak VFX (fire + lightning)
+			_update_combo_vfx(combo)
+			
+			# Combo-based screen shake (combo 2+)
+			if combo >= 1:
+				var combo_shake = 1.5 + (combo - 1) * 0.7  # 2→1.5, 3→2.2, 4→3.0, etc
+				if combo_shake > _shake_intensity:
+					_shake_intensity = combo_shake
+					_shake_timer = 0.0
 
 			if events.get("lines_cleared", 0) > 0:
 				_spawn_floating_text(events)
@@ -480,20 +497,86 @@ func _spawn_hard_drop_impact_particles(events: Dictionary) -> void:
 		particles.configure(screen_pos, spark_color, particle_amount, vel_min, vel_max)
 		add_child(particles)
 
+
 # =============================================================================
-# AMBIENT SPARKLE PARTICLES (persistent atmospheric effect)
+# COMBO STREAK VFX (fire + lightning)
 # =============================================================================
 
-func _setup_ambient_sparkles() -> void:
-	var play_top = Constants.BOARD_OFFSET.y + Constants.BUFFER_ROWS * Constants.CELL_SIZE
-	var play_h = Constants.VISIBLE_ROWS * Constants.CELL_SIZE
-	var board_w = Constants.COLS * Constants.CELL_SIZE
+func _update_combo_vfx(combo_count: int) -> void:
+	if combo_count < 1:
+		# No combo or combo broken — fade out effects
+		_stop_combo_vfx()
+		return
 
-	var sparkles = AmbientSparklesScene.instantiate()
-	sparkles.name = "AmbientSparkles"
-	var p_pos = Vector2(Constants.BOARD_OFFSET.x + board_w * 0.5, play_top + play_h)
-	sparkles.configure(p_pos, board_w * 0.5)
-	add_child(sparkles)
+	# Combo 2+ — fire at bottom of board
+	if _combo_fire == null or not is_instance_valid(_combo_fire):
+		_spawn_combo_fire()
+	_combo_fire.set_intensity(combo_count)
+
+	# Combo 3+ — lightning on side edges
+	if combo_count >= 2:
+		if _combo_lightning_left == null or not is_instance_valid(_combo_lightning_left):
+			_spawn_combo_lightning()
+		_combo_lightning_left.set_intensity(combo_count)
+		_combo_lightning_right.set_intensity(combo_count)
+	elif _combo_lightning_left != null and is_instance_valid(_combo_lightning_left):
+		_combo_lightning_left.stop()
+		_combo_lightning_right.stop()
+		_combo_lightning_left = null
+		_combo_lightning_right = null
+
+
+func _spawn_combo_fire() -> void:
+	var board_w := Constants.COLS * Constants.CELL_SIZE
+	var board_bottom := Constants.BOARD_OFFSET.y + Constants.TOTAL_ROWS * Constants.CELL_SIZE
+	var center_x := Constants.BOARD_OFFSET.x + board_w * 0.5
+
+	_combo_fire = ComboFireEffectScene.instantiate()
+	_combo_fire.configure(Vector2(center_x, board_bottom), board_w * 0.5)
+	add_child(_combo_fire)
+
+
+func _spawn_combo_lightning() -> void:
+	var board_left := Constants.BOARD_OFFSET.x
+	var board_right := Constants.BOARD_OFFSET.x + Constants.COLS * Constants.CELL_SIZE
+	var visible_top := Constants.BOARD_OFFSET.y + Constants.BUFFER_ROWS * Constants.CELL_SIZE
+	var visible_bottom := Constants.BOARD_OFFSET.y + Constants.TOTAL_ROWS * Constants.CELL_SIZE
+	# Cover bottom 60% of visible area to avoid top playfield
+	var zone_top := visible_top + (visible_bottom - visible_top) * 0.4
+	var zone_center_y := (zone_top + visible_bottom) * 0.5
+	var zone_half_height := (visible_bottom - zone_top) * 0.5
+
+	_combo_lightning_left = ComboLightningEffectScene.instantiate()
+	_combo_lightning_left.configure(Vector2(board_left, zone_center_y), zone_half_height, true)
+	add_child(_combo_lightning_left)
+
+	_combo_lightning_right = ComboLightningEffectScene.instantiate()
+	_combo_lightning_right.configure(Vector2(board_right, zone_center_y), zone_half_height, false)
+	add_child(_combo_lightning_right)
+
+
+func _stop_combo_vfx() -> void:
+	if _combo_fire != null and is_instance_valid(_combo_fire):
+		_combo_fire.stop()
+		_combo_fire = null
+	if _combo_lightning_left != null and is_instance_valid(_combo_lightning_left):
+		_combo_lightning_left.stop()
+		_combo_lightning_left = null
+	if _combo_lightning_right != null and is_instance_valid(_combo_lightning_right):
+		_combo_lightning_right.stop()
+		_combo_lightning_right = null
+
+
+func _force_clear_combo_vfx() -> void:
+	if _combo_fire != null and is_instance_valid(_combo_fire):
+		_combo_fire.queue_free()
+		_combo_fire = null
+	if _combo_lightning_left != null and is_instance_valid(_combo_lightning_left):
+		_combo_lightning_left.queue_free()
+		_combo_lightning_left = null
+	if _combo_lightning_right != null and is_instance_valid(_combo_lightning_right):
+		_combo_lightning_right.queue_free()
+		_combo_lightning_right = null
 
 
 # =============================================================================

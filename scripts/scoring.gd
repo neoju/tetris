@@ -26,6 +26,7 @@ var level: int = 1
 var lines_cleared: int = 0
 var combo_count: int = -1
 var back_to_back: bool = false
+var combo_grace_pieces: int = 0
 
 
 func get_score() -> int:
@@ -57,9 +58,12 @@ func process_placement(
 	var combo_bonus := 0
 	if lines > 0:
 		combo_count += 1
+		combo_grace_pieces = 0
 		combo_bonus = 50 * combo_count * level
 	else:
-		combo_count = -1
+		combo_grace_pieces += 1
+		if combo_grace_pieces > 1:
+			combo_count = -1
 
 	var perfect_clear_bonus := 0
 	if is_perfect_clear and PERFECT_CLEAR_POINTS.has(lines):
@@ -135,6 +139,7 @@ func reset() -> void:
 	lines_cleared = 0
 	combo_count = -1
 	back_to_back = false
+	combo_grace_pieces = 0
 
 
 func _get_line_clear_points(lines: int, is_tspin: bool, is_tspin_mini: bool) -> int:
