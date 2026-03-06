@@ -16,15 +16,16 @@ const COLORS := {
 }
 
 # Spawn positions (grid coordinates) - Row 1 is in buffer zone (above visible area)
-# Column centering: I/O centered at 3, J/L/S/T/Z left-centered at 3
+# Column centering: pieces centered in 10-column grid (0-9)
+# I-piece at 4 (4 cells wide: 3-6), O-piece at 4 (2 cells wide: 4-5), others at 4 (3 cells wide: 3-5)
 const SPAWN_POSITIONS := {
-	"I": Vector2i(3, 1),
-	"J": Vector2i(3, 1),
-	"L": Vector2i(3, 1),
-	"O": Vector2i(3, 1),  # O spawns at 3, its center is at 4 (width 2)
-	"S": Vector2i(3, 1),
-	"T": Vector2i(3, 1),
-	"Z": Vector2i(3, 1),
+	"I": Vector2i(4, 1),
+	"J": Vector2i(4, 1),
+	"L": Vector2i(4, 1),
+	"O": Vector2i(4, 1),
+	"S": Vector2i(4, 1),
+	"T": Vector2i(4, 1),
+	"Z": Vector2i(4, 1),
 }
 
 # SHAPES: Array of 4 rotation states per piece type
