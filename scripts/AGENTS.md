@@ -9,18 +9,18 @@
 |--------|-------|---------|
 | `game_logic.gd` | 423 | Core game loop: gravity, input, lock, hold. Returns event dict from `update(delta)` |
 | `grid.gd` | 162 | Playfield storage, collision, line detection/clearing, perfect clear |
-| `scoring.gd` | 171 | Points, T-spin detection (3-corner), B2B, combos, level progression |
+| `scoring.gd` | 176 | Points, T-spin detection (3-corner), B2B, combos, level progression |
 | `piece.gd` | 87 | Single tetromino: position, rotation with wall kicks, ghost calculation |
 | `bag_randomizer.gd` | 82 | 7-bag piece randomizer with peek support |
 | `input_handler.gd` | 120 | DAS/ARR implementation, returns action dict to GameLogic |
 | `lock_delay.gd` | 40 | Lock timer with move-count reset (0.5s, max 15 moves) |
-| `constants.gd` | 72 | All magic numbers: grid sizes, timing, VFX, input, audio, design width |
+| `constants.gd` | 70 | All magic numbers: grid sizes, timing, VFX, input, audio, design width |
 | `board_vfx.gd` | 151 | VFX state: clear animation timer/data, screen shake, border glow. No rendering. |
 
 ### Static Data (no extends)
 | Script | Lines | Purpose |
 |--------|-------|---------|
-| `tetromino_data.gd` | 90 | Piece shapes, colors, spawn positions (Y-negated from wiki) |
+| `tetromino_data.gd` | 91 | Piece shapes, colors, spawn positions (Y-negated from wiki) |
 | `wall_kick_data.gd` | 187 | SRS kick tables for I and JLSTZ (Y-negated from wiki) |
 
 ### Node-Based (rendering/UI/audio)
@@ -31,7 +31,7 @@
 | `particle_effects.gd` | 233 | Node2D child of GameBoard: line clear bursts, lock sparks, hard drop impact, combo fire/lightning, level up particles |
 | `game_manager.gd` | 217 | State machine (MENU/COUNTDOWN/PLAYING/PAUSED/GAME_OVER), wires UI ↔ GameBoard, viewport centering, background selection. Ghost toggle wiring |
 | `sfx_manager.gd` | 35 | Autoload singleton, AudioStreamPlayer pool, `play(name)` API |
-| `music_manager.gd` | 246 | Autoload singleton, level-based track selection, preload/play/stop/pause/toggle API |
+| `music_manager.gd` | 78 | Autoload singleton, random track per game, play/stop/pause/toggle API |
 | `background_manager.gd` | 109 | CanvasLayer -1, hardcoded manifest of 24 background sets, random selection, cover-mode parallax shader layers, viewport resize |
 | `ui_panel.gd` | 33 | HUD (scene: `hud.tscn`): score/level/lines labels, wires PieceOverlay |
 | `piece_overlay.gd` | 78 | Draws hold + next piece miniatures |

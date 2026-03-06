@@ -1,16 +1,16 @@
 # test/unit/ — GUT Unit Tests
 
-6 test files, 66 tests total. Framework: GUT 9.6.0 (vendored in `addons/gut/`).
+6 test files, 68 tests total. Framework: GUT 9.6.0 (vendored in `addons/gut/`).
 
 ## TEST FILES
-| File | Lines | Tests | Covers |
+| File | Tests | Lines | Covers |
 |------|-------|-------|--------|
-| `test_grid.gd` | 211 | Grid placement, collision, line clear, perfect clear |
-| `test_game_logic.gd` | 179 | GameLogic flows: spawn, gravity, hold, lock, combos, level up, game over |
-| `test_rotation.gd` | 178 | Piece rotation, SRS wall kicks, ghost positions |
-| `test_bag.gd` | 130 | 7-bag properties, peek, drought limits, reset |
-| `test_scoring.gd` | 121 | Scoring formulas, T-spin, B2B, combos, level cap |
-| `test_lock_delay.gd` | 81 | Lock timer, move reset, max moves |
+| `test_grid.gd` | 16 | 211 | Grid placement, collision, line clear, perfect clear |
+| `test_scoring.gd` | 14 | 121 | Scoring formulas, T-spin, B2B, combos, level cap |
+| `test_game_logic.gd` | 13 | 179 | GameLogic flows: spawn, gravity, hold, lock, combos, level up, game over |
+| `test_rotation.gd` | 11 | 178 | Piece rotation, SRS wall kicks, ghost positions |
+| `test_bag.gd` | 7 | 130 | 7-bag properties, peek, drought limits, reset |
+| `test_lock_delay.gd` | 7 | 81 | Lock timer, move reset, max moves |
 
 ## CONVENTIONS
 - All tests `extends GutTest`

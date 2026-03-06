@@ -1,7 +1,7 @@
 # PROJECT KNOWLEDGE BASE
 
 **Generated:** 2026-03-06
-**Commit:** b695fb0
+**Commit:** b8e0760
 **Branch:** master
 
 ## OVERVIEW
@@ -12,12 +12,12 @@ Tetris Guideline-compliant game in Godot 4.6 / GDScript. Pure logic classes (Ref
 ./
 ├── scripts/         # Core game logic + rendering (20 .gd files) — SEE scripts/AGENTS.md
 ├── scenes/          # .tscn scene files (main, board, HUD, screens, particles)
-│   └── particles/   # CPUParticles2D effects (4 scenes + 4 scripts)
+│   └── particles/   # CPUParticles2D effects (7 scenes + 7 scripts) — SEE scenes/particles/AGENTS.md
 ├── test/unit/       # GUT unit tests (6 files) — SEE test/unit/AGENTS.md
 ├── tools/           # Python asset generators (block sprites, SFX WAVs)
 ├── assets/          # Static: blocks/, fonts/, sfx/, shaders/, ui/
 │   ├── backgrounds/ # 24 parallax pixel-art background sets (mountain/clouds/city ×8)
-│   └── music/       # Generated chiptune music tracks (WAV)
+│   └── music/       # OGG music tracks (6 tracks, random per game)
 └── addons/gut/      # VENDOR: GUT 9.6.0 test framework — DO NOT EDIT
 ```
 
@@ -25,14 +25,14 @@ Tetris Guideline-compliant game in Godot 4.6 / GDScript. Pure logic classes (Ref
 | Task | Location | Notes |
 |------|----------|-------|
 | Change game rules | `scripts/game_logic.gd` | Pure RefCounted, returns event dict |
-| Change visuals/VFX | `scripts/game_board.gd` | 333-line coordinator; VFX state in `board_vfx.gd`, text in `floating_text_renderer.gd`, particles in `particle_effects.gd` |
+| Change visuals/VFX | `scripts/game_board.gd` | 334-line coordinator; VFX state in `board_vfx.gd`, text in `floating_text_renderer.gd`, particles in `particle_effects.gd` |
 | Add/change piece data | `scripts/tetromino_data.gd` + `wall_kick_data.gd` | Y-values NEGATED from wiki |
 | Modify scoring | `scripts/scoring.gd` | T-spin 3-corner rule, B2B, combos |
 | Change input timing | `scripts/input_handler.gd` | DAS=0.167s, ARR=0.033s |
 | Tweak constants | `scripts/constants.gd` | Grid sizes, timing, VFX, lock delay |
 | Add sounds | `scripts/sfx_manager.gd` + `assets/sfx/` | Autoload singleton, pool of 4 players |
 | Change backgrounds | `scripts/background_manager.gd` + `assets/backgrounds/` | 24 sets, random per game, parallax shader |
-| Change music | `scripts/music_manager.gd` + `assets/music/` | Autoload singleton, level-based tracks |
+| Change music | `scripts/music_manager.gd` + `assets/music/` | Autoload singleton, random track per game, looping |
 | Scene composition | `scenes/main.tscn` | Root=Main, script=game_manager.gd |
 | Run tests | CLI command below | GUT headless |
 | Regenerate assets | `tools/generate_blocks.py`, `tools/generate_sfx.py` | Python, PIL/stdlib |
@@ -107,7 +107,7 @@ godot --headless --path . --export-release "Web" build/index.html
 
 ## NOTES
 - No CI/CD pipeline — tests run locally only
-- Web export preset configured in `export_presets.cfg` (Emscripten, threads enabled)
+- Web export preset configured in `export_presets.cfg` (Emscripten, custom HTML shell, thread pools configured)
 - `.sisyphus/` contains project planning artifacts — not runtime code
 - Test evidence shows 68/68 tests passing at last recorded run
 - Constants centralized in `scripts/constants.gd` — check there before adding magic numbers
