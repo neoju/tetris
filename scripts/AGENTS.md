@@ -32,7 +32,7 @@
 | `game_manager.gd` | 217 | State machine (MENU/COUNTDOWN/PLAYING/PAUSED/GAME_OVER), wires UI ↔ GameBoard, viewport centering, background selection. Ghost toggle wiring |
 | `sfx_manager.gd` | 35 | Autoload singleton, AudioStreamPlayer pool, `play(name)` API |
 | `music_manager.gd` | 246 | Autoload singleton, level-based track selection, preload/play/stop/pause/toggle API |
-| `background_manager.gd` | 121 | CanvasLayer -1, scans 24 background sets, random selection, parallax shader layers, viewport resize |
+| `background_manager.gd` | 109 | CanvasLayer -1, hardcoded manifest of 24 background sets, random selection, cover-mode parallax shader layers, viewport resize |
 | `ui_panel.gd` | 33 | HUD (scene: `hud.tscn`): score/level/lines labels, wires PieceOverlay |
 | `piece_overlay.gd` | 78 | Draws hold + next piece miniatures |
 

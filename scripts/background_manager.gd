@@ -1,74 +1,58 @@
 extends CanvasLayer
 
-const TEXTURE_WIDTH: int = 576
-const TEXTURE_HEIGHT: int = 324
-const TEXTURE_ASPECT: float = float(TEXTURE_WIDTH) / float(TEXTURE_HEIGHT)
-const VIEWPORT_HEIGHT: int = 1040
-const SCALE_FACTOR: float = float(VIEWPORT_HEIGHT) / float(TEXTURE_HEIGHT)
-
 const BACKGROUNDS_PATH: String = "res://assets/backgrounds/"
 const SHADER_PATH: String = "res://assets/shaders/parallax_layer.gdshader"
 
+# Hardcoded manifest — DirAccess scanning doesn't work on web exports
+# because imported .png files are not listed in PCK directory listings.
+# Key = set name, value = number of layers (files named 1.png, 2.png, ...).
+const SETS: Dictionary = {
+	"city_01": 7, "city_02": 8, "city_03": 7, "city_04": 8,
+	"city_05": 7, "city_06": 8, "city_07": 7, "city_08": 7,
+	"clouds_01": 4, "clouds_02": 4, "clouds_03": 4, "clouds_04": 4,
+	"clouds_05": 5, "clouds_06": 6, "clouds_07": 4, "clouds_08": 6,
+	"mountain_01": 5, "mountain_02": 7, "mountain_03": 5, "mountain_04": 3,
+	"mountain_05": 4, "mountain_06": 5, "mountain_07": 3, "mountain_08": 3,
+}
+
 var _layer_rects: Array[ColorRect] = []
-var _background_sets: Array[String] = []
+var _set_names: Array[String] = []
 var _shader: Shader
 var _current_set: String = ""
+var _texture_size: Vector2 = Vector2(576.0, 324.0)
 
 
 func _ready() -> void:
 	layer = -1
 	_shader = load(SHADER_PATH)
-	_scan_background_sets()
+	_set_names.assign(SETS.keys())
+	_set_names.sort()
 	get_viewport().size_changed.connect(_on_viewport_resized)
 	select_random()
 
 
-func _scan_background_sets() -> void:
-	_background_sets.clear()
-	var dir := DirAccess.open(BACKGROUNDS_PATH)
-	if dir == null:
-		return
-	dir.list_dir_begin()
-	var folder := dir.get_next()
-	while folder != "":
-		if dir.current_is_dir() and not folder.begins_with("."):
-			_background_sets.append(folder)
-		folder = dir.get_next()
-	_background_sets.sort()
-
-
 func select_random() -> void:
-	if _background_sets.is_empty():
+	if _set_names.is_empty():
 		return
-	var idx := randi() % _background_sets.size()
-	load_set(_background_sets[idx])
+	var idx := randi() % _set_names.size()
+	load_set(_set_names[idx])
 
 
 func load_set(bg_set_name: String) -> void:
 	_clear_layers()
 	_current_set = bg_set_name
 
-	var set_path := BACKGROUNDS_PATH + bg_set_name + "/"
-	var dir := DirAccess.open(set_path)
-	if dir == null:
+	if not SETS.has(bg_set_name):
 		return
 
-	var png_files: Array[String] = []
-	dir.list_dir_begin()
-	var file := dir.get_next()
-	while file != "":
-		if not dir.current_is_dir() and file.ends_with(".png"):
-			png_files.append(file)
-		file = dir.get_next()
-	png_files.sort_custom(func(a: String, b: String) -> bool:
-		return a.get_basename().to_int() < b.get_basename().to_int()
-	)
-
-	var layer_count := png_files.size()
+	var layer_count: int = SETS[bg_set_name]
 	for i in range(layer_count):
-		var texture := load(set_path + png_files[i]) as Texture2D
+		var path := BACKGROUNDS_PATH + bg_set_name + "/" + str(i + 1) + ".png"
+		var texture := load(path) as Texture2D
 		if texture == null:
 			continue
+		if i == 0:
+			_texture_size = texture.get_size()
 		var speed := _calculate_scroll_speed(i, layer_count)
 		_create_layer_rect(texture, speed)
 
@@ -90,7 +74,6 @@ func _create_layer_rect(texture: Texture2D, scroll_speed: float) -> void:
 	mat.shader = _shader
 	mat.set_shader_parameter("layer_texture", texture)
 	mat.set_shader_parameter("scroll_speed", scroll_speed)
-	mat.set_shader_parameter("tiles_across", 1.0)
 	rect.material = mat
 
 	add_child(rect)
@@ -102,16 +85,21 @@ func _on_viewport_resized() -> void:
 	var vw := viewport_size.x
 	var vh := viewport_size.y
 
-	var tiles_across := (vw / vh) / TEXTURE_ASPECT
-	if tiles_across < 1.0:
-		tiles_across = 1.0
+	# Cover mode: scale texture proportionally to fill entire viewport,
+	# cropping excess rather than letterboxing or maintaining aspect ratio.
+	var scale_x := vw / _texture_size.x
+	var scale_y := vh / _texture_size.y
+	var cover_scale := maxf(scale_x, scale_y)
+
+	var rect_w := _texture_size.x * cover_scale
+	var rect_h := _texture_size.y * cover_scale
+
+	var offset_x := (vw - rect_w) * 0.5
+	var offset_y := (vh - rect_h) * 0.5
 
 	for rect in _layer_rects:
-		rect.position = Vector2.ZERO
-		rect.size = Vector2(vw, vh)
-		var mat := rect.material as ShaderMaterial
-		if mat != null:
-			mat.set_shader_parameter("tiles_across", tiles_across)
+		rect.position = Vector2(offset_x, offset_y)
+		rect.size = Vector2(rect_w, rect_h)
 
 
 func _clear_layers() -> void:
