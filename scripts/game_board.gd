@@ -5,6 +5,7 @@ const GameLogicScript = preload("res://scripts/game_logic.gd")
 const GridScript = preload("res://scripts/grid.gd")
 const BoardVfxScript = preload("res://scripts/board_vfx.gd")
 const FloatingTextRendererScript = preload("res://scripts/floating_text_renderer.gd")
+const LeftPanelDisplayScript = preload("res://scripts/left_panel_display.gd")
 const ParticleEffectsScript = preload("res://scripts/particle_effects.gd")
 
 var game_logic: GameLogicScript
@@ -14,6 +15,7 @@ var show_ghost: bool = true
 
 var _vfx: BoardVfxScript
 var _text_renderer: Node2D   # FloatingTextRenderer
+var _left_panel: Node2D   # LeftPanelDisplay (persistent counters)
 var _particles: Node2D        # ParticleEffects
 var _original_position: Vector2 = Vector2.ZERO
 
@@ -41,6 +43,9 @@ func _ready() -> void:
 	_text_renderer = FloatingTextRendererScript.new()
 	add_child(_text_renderer)
 
+	_left_panel = LeftPanelDisplayScript.new()
+	add_child(_left_panel)
+
 	_particles = ParticleEffectsScript.new()
 	add_child(_particles)
 
@@ -50,6 +55,7 @@ func _ready() -> void:
 
 func clear_floating_texts() -> void:
 	_text_renderer.clear()
+	_left_panel.clear()
 	_vfx.reset()
 	position = _original_position
 	_particles.force_clear()
@@ -123,12 +129,27 @@ func _process(delta: float) -> void:
 				var combo_shake = 1.5 + (combo - 1) * 0.7
 				_vfx.apply_shake(combo_shake)
 
-			if events.get("lines_cleared", 0) > 0:
-				_text_renderer.spawn(events)
-				_vfx.start_clear(events)
-				_vfx.trigger_shake(events)
-				_vfx.trigger_border_glow(events)
-				_particles.spawn_clear_particles(events)
+		if events.get("lines_cleared", 0) > 0:
+			_text_renderer.spawn(events)
+			_vfx.start_clear(events)
+			_vfx.trigger_shake(events)
+			_vfx.trigger_border_glow(events)
+			_particles.spawn_clear_particles(events)
+
+			# Update left panel persistent counters
+			var combo = events.get("combo_count", -1)
+			var b2b_count = events.get("back_to_back_count", 0)
+
+			if combo >= 1:
+				_left_panel.update_combo(combo)
+			elif combo == -1:
+				_left_panel.clear_combo()
+
+			if b2b_count > 0:
+				_left_panel.update_b2b(b2b_count)
+			elif b2b_count == 0:
+				# B2B broke on this line clear
+				_left_panel.clear_b2b()
 
 		if events.get("level_up", false):
 			SfxManager.play("level_up")
