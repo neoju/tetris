@@ -1,6 +1,6 @@
 # scripts/ — Core Game Logic & Rendering
 
-18 GDScript files. Pure logic (RefCounted) separated from Node rendering layer.
+20 GDScript files. Pure logic (RefCounted) separated from Node rendering layer.
 
 ## SCRIPT CATALOG
 
@@ -14,7 +14,7 @@
 | `bag_randomizer.gd` | 82 | 7-bag piece randomizer with peek support |
 | `input_handler.gd` | 120 | DAS/ARR implementation, returns action dict to GameLogic |
 | `lock_delay.gd` | 40 | Lock timer with move-count reset (0.5s, max 15 moves) |
-| `constants.gd` | 64 | All magic numbers: grid sizes, timing, VFX, input, audio |
+| `constants.gd` | 72 | All magic numbers: grid sizes, timing, VFX, input, audio, design width |
 | `board_vfx.gd` | 151 | VFX state: clear animation timer/data, screen shake, border glow. No rendering. |
 
 ### Static Data (no extends)
@@ -29,8 +29,10 @@
 | `game_board.gd` | 333 | Node2D coordinator: `_draw()` grid/pieces/ghost/clear-overlay/border-glow/starfall, event→SFX routing, delegates VFX state to BoardVfx, text to FloatingTextRenderer, particles to ParticleEffects |
 | `floating_text_renderer.gd` | 249 | Node2D child of GameBoard: spawns/animates/draws floating score/action/combo text |
 | `particle_effects.gd` | 233 | Node2D child of GameBoard: line clear bursts, lock sparks, hard drop impact, combo fire/lightning, level up particles |
-| `game_manager.gd` | 149 | State machine (MENU/PLAYING/PAUSED/GAME_OVER), wires UI ↔ GameBoard. Ghost toggle wiring |
+| `game_manager.gd` | 217 | State machine (MENU/COUNTDOWN/PLAYING/PAUSED/GAME_OVER), wires UI ↔ GameBoard, viewport centering, background selection. Ghost toggle wiring |
 | `sfx_manager.gd` | 35 | Autoload singleton, AudioStreamPlayer pool, `play(name)` API |
+| `music_manager.gd` | 246 | Autoload singleton, level-based track selection, preload/play/stop/pause/toggle API |
+| `background_manager.gd` | 121 | CanvasLayer -1, scans 24 background sets, random selection, parallax shader layers, viewport resize |
 | `ui_panel.gd` | 33 | HUD (scene: `hud.tscn`): score/level/lines labels, wires PieceOverlay |
 | `piece_overlay.gd` | 78 | Draws hold + next piece miniatures |
 
@@ -58,9 +60,12 @@ game_board.gd ←── thin coordinator
 └── grid.gd (direct ref for _draw)
 
 game_manager.gd ──→ game_board.game_logic (runtime reference)
+game_manager.gd ──→ background_manager.gd (select_random on new game)
 ui_panel.gd ──→ game_logic (via setter)
 piece_overlay.gd ──→ tetromino_data.gd + game_logic (reads hold/next)
 sfx_manager.gd ──→ constants.gd (pool size, volume)
+music_manager.gd ──→ constants.gd (autoload singleton)
+background_manager.gd ──→ parallax_layer.gdshader (load at runtime)
 ```
 
 ## EVENT DICTIONARY SCHEMA
@@ -97,7 +102,7 @@ sfx_manager.gd ──→ constants.gd (pool size, volume)
 
 ## CONVENTIONS (scripts-specific)
 - RefCounted logic classes: always use `class_name`, always `preload().new()`
-- Node scripts without `class_name`: game_board, sfx_manager, ui_panel, piece_overlay, floating_text_renderer, particle_effects
+- Node scripts without `class_name`: game_board, sfx_manager, ui_panel, piece_overlay, floating_text_renderer, particle_effects, background_manager, music_manager
 - Constants accessed via `Constants.SYMBOL` (class_name reference, no instantiation needed)
 - All wall kick / shape data: Y-values negated from Tetris wiki (Godot Y+ = down)
 - GameBoard child nodes (FloatingTextRenderer, ParticleEffects) created via `preload().new()` + `add_child()` in `_ready()` — draw order is tree order
