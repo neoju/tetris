@@ -109,8 +109,6 @@ func _begin_countdown(fresh_game: bool) -> void:
 		game_board.game_logic.start_game()
 		game_board.clear_floating_texts()
 
-	MusicManager.preload_initial_track()
-
 	game_board.set_process(false)
 	hud.set_process(true)
 
@@ -125,7 +123,7 @@ func _on_countdown_finished() -> void:
 	menu_button.visible = true
 	game_board.set_process(true)
 	hud.set_process(true)
-	MusicManager.play_for_level(1)
+	MusicManager.play()
 
 
 # =============================================================================

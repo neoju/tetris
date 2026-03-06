@@ -68,5 +68,3 @@ const SFX_VOLUME_DB: float = -7.0
 # MUSIC
 # =============================================================================
 const MUSIC_VOLUME_DB: float = -12.0
-const MUSIC_CROSSFADE_TIME: float = 0.8
-const MUSIC_TIER_LEVELS: Array = [1, 6, 11]  # Tier 1: L1-5, Tier 2: L6-10, Tier 3: L11-15

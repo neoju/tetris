@@ -1,11 +1,11 @@
-[gd_scene load_steps=2 format=3 uid="uid://gameboarduid123"]
+[gd_scene format=3 uid="uid://c27q8cl6l0acw"]
 
 [ext_resource type="Script" uid="uid://mvy2xwojnsb6" path="res://scripts/game_board.gd" id="1_gb"]
 
-[node name="GameBoard" type="Node2D"]
+[node name="GameBoard" type="Node2D" unique_id=1824419118]
 script = ExtResource("1_gb")
 
-[node name="BoardBG" type="ColorRect" parent="."]
+[node name="BoardBG" type="ColorRect" parent="." unique_id=382723258]
 show_behind_parent = true
 offset_left = 80.0
 offset_top = 86.0
