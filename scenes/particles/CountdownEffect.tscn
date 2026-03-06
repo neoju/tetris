@@ -1,0 +1,6 @@
+[gd_scene load_steps=2 format=3 uid="uid://countdown_effect"]
+
+[ext_resource type="Script" uid="uid://countdown_effect_gd" path="res://scenes/particles/CountdownEffect.gd" id="1"]
+
+[node name="CountdownEffect" type="Node2D"]
+script = ExtResource("1")
