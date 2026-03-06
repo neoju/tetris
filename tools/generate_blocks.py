@@ -42,30 +42,84 @@ def darken_color(rgb, amount=60):
 
 
 def create_beveled_block(base_color_hex, output_path):
-    """Create a 32x32 beveled block sprite"""
+    """Create a 32x32 inset square block sprite with professional pixel-art beveling"""
     # Create image with transparency
     img = Image.new("RGBA", (BLOCK_SIZE, BLOCK_SIZE), (0, 0, 0, 0))
     draw = ImageDraw.Draw(img)
 
     # Convert hex to RGB
     base_color = hex_to_rgb(base_color_hex)
-    light_color = lighten_color(base_color, 80)
-    dark_color = darken_color(base_color, 60)
 
-    # Draw main block body (with 2px border for bevel)
+    # Generate palette
+    highlight = lighten_color(base_color, 60)
+    shadow = darken_color(base_color, 60)
+    deep_shadow = darken_color(base_color, 120)
+    inner_shadow = darken_color(base_color, 30)
+    inner_highlight = lighten_color(base_color, 30)
+
+    # 1. Base fill
     draw.rectangle([0, 0, BLOCK_SIZE - 1, BLOCK_SIZE - 1], fill=base_color)
 
-    # Top edge
-    draw.rectangle([0, 0, BLOCK_SIZE - 1, 1], fill=light_color)
+    # 2. Outer Bevel (4px wide)
+    bw = 4
 
-    # Bottom edge
-    draw.rectangle([0, BLOCK_SIZE - 2, BLOCK_SIZE - 1, BLOCK_SIZE - 1], fill=dark_color)
+    # Top edge (highlight)
+    draw.rectangle([1, 1, BLOCK_SIZE - 2, bw], fill=highlight)
+    # Left edge (highlight)
+    draw.rectangle([1, 1, bw, BLOCK_SIZE - 2], fill=highlight)
 
-    # Left edge
-    draw.rectangle([0, 0, 1, BLOCK_SIZE - 1], fill=light_color)
+    # Bottom edge (shadow)
+    draw.rectangle(
+        [1, BLOCK_SIZE - 1 - bw, BLOCK_SIZE - 2, BLOCK_SIZE - 2], fill=shadow
+    )
+    # Right edge (shadow)
+    draw.rectangle(
+        [BLOCK_SIZE - 1 - bw, 1, BLOCK_SIZE - 2, BLOCK_SIZE - 2], fill=shadow
+    )
 
-    # Right edge
-    draw.rectangle([BLOCK_SIZE - 2, 0, BLOCK_SIZE - 1, BLOCK_SIZE - 1], fill=dark_color)
+    # Corners to smooth the bevel
+    draw.rectangle(
+        [1, BLOCK_SIZE - 1 - bw, bw, BLOCK_SIZE - 2], fill=base_color
+    )  # Bottom-left mix
+    draw.rectangle(
+        [BLOCK_SIZE - 1 - bw, 1, BLOCK_SIZE - 2, bw], fill=base_color
+    )  # Top-right mix
+
+    # 3. Inner Square (Inset)
+    inset = bw + 1
+    # Fill the inner square with base color
+    draw.rectangle(
+        [inset, inset, BLOCK_SIZE - 1 - inset, BLOCK_SIZE - 1 - inset], fill=base_color
+    )
+
+    # Inner shadow (top and left) to create recessed look
+    draw.line(
+        [(inset, inset), (BLOCK_SIZE - 1 - inset, inset)], fill=inner_shadow, width=1
+    )
+    draw.line(
+        [(inset, inset), (inset, BLOCK_SIZE - 1 - inset)], fill=inner_shadow, width=1
+    )
+
+    # Inner highlight (bottom and right) to complete recessed look
+    draw.line(
+        [
+            (inset, BLOCK_SIZE - 1 - inset),
+            (BLOCK_SIZE - 1 - inset, BLOCK_SIZE - 1 - inset),
+        ],
+        fill=inner_highlight,
+        width=1,
+    )
+    draw.line(
+        [
+            (BLOCK_SIZE - 1 - inset, inset),
+            (BLOCK_SIZE - 1 - inset, BLOCK_SIZE - 1 - inset),
+        ],
+        fill=inner_highlight,
+        width=1,
+    )
+
+    # 4. Outer outline (1px deep shadow) for crisp edge
+    draw.rectangle([0, 0, BLOCK_SIZE - 1, BLOCK_SIZE - 1], outline=deep_shadow, width=1)
 
     # Save the image
     img.save(output_path, "PNG")
