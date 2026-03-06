@@ -113,19 +113,22 @@ func _draw() -> void:
 	color.a = alpha
 
 	var y_cursor = pos.y
+	# Text box spans [0 .. LEFT_PANEL_X_RIGHT]; pos.x is the left edge of the box.
+	# RIGHT alignment means text right-aligns to pos.x + width = LEFT_PANEL_X_RIGHT.
+	var box_x = 0.0
 
 	# B2B line (if present)
 	if _active_display["b2b_text"] != "":
 		var b2b_color = Color(1.0, 0.85, 0.0, alpha)
 		var b2b_size = int(Constants.LEFT_PANEL_B2B_FONT_SIZE * scale_factor)
-		draw_string(_font_bold, Vector2(pos.x, y_cursor), _active_display["b2b_text"],
-			HORIZONTAL_ALIGNMENT_RIGHT, Constants.LEFT_PANEL_TEXT_WIDTH, b2b_size, b2b_color)
+		draw_string(_font_bold, Vector2(box_x, y_cursor), _active_display["b2b_text"],
+			HORIZONTAL_ALIGNMENT_RIGHT, Constants.LEFT_PANEL_X_RIGHT, b2b_size, b2b_color)
 		y_cursor += b2b_size + Constants.LEFT_PANEL_LINE_GAP
 
 	# Action line (always)
 	var action_size = int(Constants.LEFT_PANEL_ACTION_FONT_SIZE * scale_factor)
-	draw_string(_font_bold, Vector2(pos.x, y_cursor), _active_display["action_text"],
-		HORIZONTAL_ALIGNMENT_RIGHT, Constants.LEFT_PANEL_TEXT_WIDTH, action_size, color)
+	draw_string(_font_bold, Vector2(box_x, y_cursor), _active_display["action_text"],
+		HORIZONTAL_ALIGNMENT_RIGHT, Constants.LEFT_PANEL_X_RIGHT, action_size, color)
 	y_cursor += action_size + Constants.LEFT_PANEL_LINE_GAP
 
 	# Combo line (if present)
@@ -133,8 +136,8 @@ func _draw() -> void:
 		var combo_color = _get_combo_color(_active_display["combo_count"])
 		combo_color.a = alpha
 		var combo_size = int(Constants.LEFT_PANEL_COMBO_FONT_SIZE * scale_factor)
-		draw_string(_font_bold, Vector2(pos.x, y_cursor), _active_display["combo_text"],
-			HORIZONTAL_ALIGNMENT_RIGHT, Constants.LEFT_PANEL_TEXT_WIDTH, combo_size, combo_color)
+		draw_string(_font_bold, Vector2(box_x, y_cursor), _active_display["combo_text"],
+			HORIZONTAL_ALIGNMENT_RIGHT, Constants.LEFT_PANEL_X_RIGHT, combo_size, combo_color)
 
 
 # =============================================================================
