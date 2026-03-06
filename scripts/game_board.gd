@@ -4,7 +4,7 @@ const Constants = preload("res://scripts/constants.gd")
 const GameLogicScript = preload("res://scripts/game_logic.gd")
 const GridScript = preload("res://scripts/grid.gd")
 const BoardVfxScript = preload("res://scripts/board_vfx.gd")
-const FloatingTextRendererScript = preload("res://scripts/floating_text_renderer.gd")
+const LeftPanelDisplayScript = preload("res://scripts/left_panel_display.gd")
 const ParticleEffectsScript = preload("res://scripts/particle_effects.gd")
 
 var game_logic: GameLogicScript
@@ -13,7 +13,7 @@ var game_manager = null
 var show_ghost: bool = true
 
 var _vfx: BoardVfxScript
-var _text_renderer: Node2D   # FloatingTextRenderer
+var _left_panel: Node2D   # LeftPanelDisplay
 var _particles: Node2D        # ParticleEffects
 var _original_position: Vector2 = Vector2.ZERO
 
@@ -38,8 +38,8 @@ func _ready() -> void:
 	_vfx = BoardVfxScript.new()
 
 	# Child Node2D renderers (draw order: text on top of board, particles on top of text)
-	_text_renderer = FloatingTextRendererScript.new()
-	add_child(_text_renderer)
+	_left_panel = LeftPanelDisplayScript.new()
+	add_child(_left_panel)
 
 	_particles = ParticleEffectsScript.new()
 	add_child(_particles)
@@ -49,7 +49,7 @@ func _ready() -> void:
 
 
 func clear_floating_texts() -> void:
-	_text_renderer.clear()
+	_left_panel.clear()
 	_vfx.reset()
 	position = _original_position
 	_particles.force_clear()
@@ -64,7 +64,7 @@ func _process(delta: float) -> void:
 	# Handle clear animation in progress
 	if _vfx.is_clearing():
 		var finished = _vfx.update_clear(delta)
-		_text_renderer.update_texts(delta)
+		_left_panel.update_display(delta)
 		if finished and game_logic != null:
 			var result = game_logic.complete_clear()
 			if result.get("game_over", false):
@@ -124,7 +124,7 @@ func _process(delta: float) -> void:
 				_vfx.apply_shake(combo_shake)
 
 			if events.get("lines_cleared", 0) > 0:
-				_text_renderer.spawn(events)
+				_left_panel.spawn(events)
 				_vfx.start_clear(events)
 				_vfx.trigger_shake(events)
 				_vfx.trigger_border_glow(events)
@@ -134,13 +134,13 @@ func _process(delta: float) -> void:
 			SfxManager.play("level_up")
 			var center = _get_playfield_center()
 			_particles.spawn_level_up_effect(center)
-			_text_renderer.spawn_level_up(center)
+			_left_panel.spawn_level_up()
 		if events.get("game_over", false):
 			SfxManager.play("game_over")
 			if game_manager != null:
 				game_manager.on_game_over(game_logic.scoring.score)
 
-	_text_renderer.update_texts(delta)
+	_left_panel.update_display(delta)
 	queue_redraw()
 
 
