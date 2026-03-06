@@ -132,6 +132,7 @@ func _process(delta: float) -> void:
 
 		if events.get("level_up", false):
 			SfxManager.play("level_up")
+			MusicManager.play_for_level(game_logic.scoring.level)
 			var center = _get_playfield_center()
 			_particles.spawn_level_up_effect(center)
 			_text_renderer.spawn_level_up(center)
