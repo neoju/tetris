@@ -1,15 +1,21 @@
 extends Control
 
-@onready var score_value: Label = $ScoreValue
-@onready var level_value: Label = $LevelValue
-@onready var lines_value: Label = $LinesValue
-@onready var piece_overlay: Control = $PieceOverlay
+@onready var score_value: Label = $RightScore/ScoreValue
+@onready var level_value: Label = $LeftScore/LevelValue
+@onready var lines_value: Label = $LeftScore/LinesValue
+@onready var hold_display: Control = $HoldContainer/HoldPiece
+@onready var next_display: Control = $NextContainer/NextPieces
+@onready var left_panel: Control = $LeftScore
 
 var game_logic = null:
 	set(value):
 		game_logic = value
-		if piece_overlay != null:
-			piece_overlay.game_logic = value
+		if hold_display != null:
+			hold_display.game_logic = value
+		if next_display != null:
+			next_display.game_logic = value
+		if left_panel != null:
+			left_panel.game_logic = value
 
 
 func _process(_delta: float) -> void:

@@ -1,7 +1,9 @@
 [gd_scene format=3 uid="uid://34dap23k4cd3"]
 
 [ext_resource type="Script" uid="uid://bbp6ux3gi11t1" path="res://scripts/ui_panel.gd" id="1_abc"]
-[ext_resource type="Script" uid="uid://dmdxng62rto4o" path="res://scripts/piece_overlay.gd" id="2_overlay"]
+[ext_resource type="Script" path="res://scripts/hold_display.gd" id="4_hold"]
+[ext_resource type="Script" path="res://scripts/next_display.gd" id="5_next"]
+[ext_resource type="Script" uid="uid://cogyrhe8lg6q4" path="res://scripts/left_panel_display.gd" id="3_left_panel"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_panel"]
 bg_color = Color(0.07, 0.07, 0.11, 0.8)
@@ -10,194 +12,175 @@ border_width_top = 2
 border_width_right = 2
 border_width_bottom = 2
 border_color = Color(0.45, 0.45, 0.55, 0.6)
-corner_radius_top_left = 0
-corner_radius_top_right = 0
-corner_radius_bottom_right = 0
-corner_radius_bottom_left = 0
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_menu_normal"]
-bg_color = Color(0.07, 0.07, 0.11, 0.8)
-border_width_left = 2
-border_width_top = 2
-border_width_right = 2
-border_width_bottom = 2
-border_color = Color(0.1, 0.3, 0.5, 0.3)
-corner_radius_top_left = 0
-corner_radius_top_right = 0
-corner_radius_bottom_right = 0
-corner_radius_bottom_left = 0
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_menu_pressed"]
-bg_color = Color(0.05, 0.05, 0.08, 1)
-border_width_left = 2
-border_width_top = 2
-border_width_right = 2
-border_width_bottom = 2
-border_color = Color(0.2, 0.8, 1, 1)
-corner_radius_top_left = 0
-corner_radius_top_right = 0
-corner_radius_bottom_right = 0
-corner_radius_bottom_left = 0
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_menu_hover"]
-bg_color = Color(0.15, 0.15, 0.2, 0.9)
-border_width_left = 2
-border_width_top = 2
-border_width_right = 2
-border_width_bottom = 2
-border_color = Color(0.2, 0.8, 1, 0.8)
-corner_radius_top_left = 0
-corner_radius_top_right = 0
-corner_radius_bottom_right = 0
-corner_radius_bottom_left = 0
 
 [node name="UIPanel" type="Control" unique_id=936204152]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
+offset_top = -8.0
+offset_bottom = -8.0
 grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
 script = ExtResource("1_abc")
 
-[node name="HoldBG" type="Panel" parent="." unique_id=2112773257]
+[node name="HoldContainer" type="Control" parent="." unique_id=556581838]
+anchors_preset = 0
+offset_left = -29.0
+offset_top = 93.0
+offset_right = 79.0
+offset_bottom = 189.0
+mouse_filter = 2
+
+[node name="HoldBG" type="Panel" parent="HoldContainer" unique_id=2112773257]
 layout_mode = 0
-offset_left = 2.0
-offset_top = 86.0
-offset_right = 76.0
-offset_bottom = 174.0
+offset_right = 108.0
+offset_bottom = 96.0
 mouse_filter = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_panel")
 
-[node name="HoldHeader" type="ColorRect" parent="." unique_id=462196234]
+[node name="HoldHeader" type="ColorRect" parent="HoldContainer" unique_id=462196234]
 layout_mode = 0
-offset_left = 2.0
-offset_top = 86.0
-offset_right = 76.0
-offset_bottom = 108.0
+offset_right = 108.0
+offset_bottom = 28.0
 color = Color(0.55, 0.5, 0.65, 0.85)
 
-[node name="HoldLabel" type="Label" parent="." unique_id=1620893748]
+[node name="HoldLabel" type="Label" parent="HoldContainer" unique_id=1620893748]
 layout_mode = 0
-offset_left = 2.0
-offset_top = 86.0
-offset_right = 76.0
-offset_bottom = 108.0
+offset_right = 108.0
+offset_bottom = 28.0
 theme_override_colors/font_color = Color(0.95, 0.95, 1, 1)
 theme_override_font_sizes/font_size = 28
 text = "HOLD"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="NextBG" type="Panel" parent="." unique_id=1792264568]
+[node name="HoldPiece" type="Control" parent="HoldContainer"]
 layout_mode = 0
-offset_left = 404.0
-offset_top = 86.0
-offset_right = 478.0
-offset_bottom = 318.0
+offset_right = 108.0
+offset_bottom = 96.0
+mouse_filter = 2
+script = ExtResource("4_hold")
+
+[node name="NextContainer" type="Control" parent="." unique_id=1976721813]
+anchors_preset = 0
+offset_left = 400.0
+offset_top = 93.0
+offset_right = 508.0
+offset_bottom = 353.0
+mouse_filter = 2
+
+[node name="NextBG" type="Panel" parent="NextContainer" unique_id=1792264568]
+layout_mode = 0
+offset_right = 108.0
+offset_bottom = 260.0
 mouse_filter = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_panel")
 
-[node name="NextHeader" type="ColorRect" parent="." unique_id=396947333]
+[node name="NextHeader" type="ColorRect" parent="NextContainer" unique_id=396947333]
 layout_mode = 0
-offset_left = 404.0
-offset_top = 86.0
-offset_right = 478.0
-offset_bottom = 108.0
+offset_right = 108.0
+offset_bottom = 28.0
 color = Color(0.55, 0.5, 0.65, 0.85)
 
-[node name="NextLabel" type="Label" parent="." unique_id=632189823]
+[node name="NextLabel" type="Label" parent="NextContainer" unique_id=632189823]
 layout_mode = 0
-offset_left = 404.0
-offset_top = 86.0
-offset_right = 478.0
-offset_bottom = 108.0
+offset_right = 108.0
+offset_bottom = 28.0
 theme_override_colors/font_color = Color(0.95, 0.95, 1, 1)
 theme_override_font_sizes/font_size = 28
 text = "NEXT"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="ScoreValue" type="Label" parent="." unique_id=6771264]
+[node name="NextPieces" type="Control" parent="NextContainer"]
 layout_mode = 0
-offset_left = 80.0
-offset_top = 869.0
-offset_right = 400.0
-offset_bottom = 913.0
+offset_right = 108.0
+offset_bottom = 260.0
+mouse_filter = 2
+script = ExtResource("5_next")
+
+[node name="RightScore" type="Control" parent="." unique_id=263556663]
+layout_mode = 1
+anchors_preset = 0
+offset_left = 408.0
+offset_top = 474.0
+offset_right = 568.0
+offset_bottom = 530.0
+
+[node name="ScoreLabel" type="Label" parent="RightScore" unique_id=305111883]
+layout_mode = 0
+offset_right = 45.0
+offset_bottom = 19.0
 theme_override_colors/font_color = Color(1, 1, 1, 1)
-theme_override_font_sizes/font_size = 38
-text = "0"
+theme_override_font_sizes/font_size = 24
+text = "SCORE"
 horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="ScoreValue" type="Label" parent="RightScore" unique_id=6771264]
+layout_mode = 0
+offset_top = 16.0
+offset_right = 18.0
+offset_bottom = 54.0
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_font_sizes/font_size = 48
+text = "0"
 vertical_alignment = 2
 
-[node name="LevelLabel" type="Label" parent="." unique_id=1138883398]
+[node name="LeftScore" type="Control" parent="." unique_id=172808747]
+layout_direction = 2
+anchors_preset = 0
+offset_top = 8.0
+offset_right = 80.0
+offset_bottom = 758.0
+script = ExtResource("3_left_panel")
+
+[node name="LevelLabel" type="Label" parent="LeftScore" unique_id=1138883398]
 layout_mode = 0
-offset_left = 80.0
-offset_top = 917.0
-offset_right = 400.0
-offset_bottom = 935.0
-theme_override_colors/font_color = Color(0.5, 0.55, 0.65, 1)
-theme_override_font_sizes/font_size = 18
+offset_left = 3.0
+offset_top = 703.0
+offset_right = 44.0
+offset_bottom = 721.0
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_font_sizes/font_size = 22
 text = "LEVEL"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="LevelValue" type="Label" parent="." unique_id=1859627967]
+[node name="LevelValue" type="Label" parent="LeftScore" unique_id=1859627967]
 layout_mode = 0
-offset_left = 80.0
-offset_top = 935.0
-offset_right = 400.0
-offset_bottom = 963.0
+offset_left = 46.0
+offset_top = 699.0
+offset_right = 77.0
+offset_bottom = 722.0
 theme_override_colors/font_color = Color(1, 1, 1, 1)
-theme_override_font_sizes/font_size = 22
+theme_override_font_sizes/font_size = 28
 text = "1"
-horizontal_alignment = 1
+horizontal_alignment = 2
 vertical_alignment = 1
 
-[node name="LinesLabel" type="Label" parent="." unique_id=902265708]
+[node name="LinesLabel" type="Label" parent="LeftScore" unique_id=902265708]
 layout_mode = 0
-offset_left = 80.0
-offset_top = 965.0
-offset_right = 400.0
-offset_bottom = 983.0
-theme_override_colors/font_color = Color(0.5, 0.55, 0.65, 1)
-theme_override_font_sizes/font_size = 18
+offset_left = 3.0
+offset_top = 681.0
+offset_right = 44.0
+offset_bottom = 699.0
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_font_sizes/font_size = 22
 text = "LINES"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="LinesValue" type="Label" parent="." unique_id=330077406]
+[node name="LinesValue" type="Label" parent="LeftScore" unique_id=330077406]
 layout_mode = 0
-offset_left = 80.0
-offset_top = 983.0
-offset_right = 400.0
-offset_bottom = 1011.0
+offset_left = 46.0
+offset_top = 678.0
+offset_right = 77.0
+offset_bottom = 701.0
 theme_override_colors/font_color = Color(1, 1, 1, 1)
-theme_override_font_sizes/font_size = 22
+theme_override_font_sizes/font_size = 28
 text = "0"
-horizontal_alignment = 1
+horizontal_alignment = 2
 vertical_alignment = 1
-
-[node name="PieceOverlay" type="Control" parent="." unique_id=1481415004]
-anchors_preset = 0
-offset_right = 480.0
-offset_bottom = 1040.0
-mouse_filter = 2
-script = ExtResource("2_overlay")
-
-[node name="MenuButton" type="Button" parent="." unique_id=440523067]
-layout_mode = 0
-offset_left = 408.0
-offset_top = 11.0
-offset_right = 474.0
-offset_bottom = 61.0
-theme_override_colors/font_color = Color(0.8, 0.9, 1, 1)
-theme_override_colors/font_pressed_color = Color(0.2, 0.8, 1, 1)
-theme_override_colors/font_hover_color = Color(1, 1, 1, 1)
-theme_override_font_sizes/font_size = 34
-theme_override_styles/normal = SubResource("StyleBoxFlat_menu_normal")
-theme_override_styles/pressed = SubResource("StyleBoxFlat_menu_pressed")
-theme_override_styles/hover = SubResource("StyleBoxFlat_menu_hover")
-theme_override_styles/focus = SubResource("StyleBoxFlat_menu_hover")
-text = "≡"
