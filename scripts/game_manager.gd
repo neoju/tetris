@@ -15,7 +15,6 @@ var game_over_screen: CanvasLayer
 var credits_screen: Control
 var final_score_label: Label
 var stats_label: Label
-var menu_button: Button
 var sfx_toggle: TextureButton
 var music_toggle: TextureButton
 var ghost_toggle: TextureButton
@@ -78,24 +77,19 @@ func _ready() -> void:
 	ghost_toggle = pause_menu.get_node("Control/CenterContainer/PanelContainer/VBoxContainer/GhostRow/GhostToggle")
 	ghost_toggle.toggled.connect(_on_ghost_toggled)
 
-	_create_menu_button()
-
 	get_viewport().size_changed.connect(_on_viewport_resized)
 	_on_viewport_resized()
 
 	_show_title_screen()
 
 
-func _create_menu_button() -> void:
-	menu_button = hud.get_node("MenuButton")
-	menu_button.visible = false
-	menu_button.pressed.connect(_pause)
-
-
 func _on_viewport_resized() -> void:
 	var viewport_size := get_viewport().get_visible_rect().size
-	var offset_x := (viewport_size.x - Constants.DESIGN_WIDTH) * 0.5
-	_game_content.position.x = offset_x
+	var visible_top := Constants.BOARD_OFFSET.y + Constants.BUFFER_ROWS * Constants.CELL_SIZE
+	var board_center_x := Constants.BOARD_OFFSET.x + Constants.COLS * Constants.CELL_SIZE * 0.5
+	var board_center_y := visible_top + Constants.VISIBLE_ROWS * Constants.CELL_SIZE * 0.5
+	_game_content.position.x = viewport_size.x * 0.5 - board_center_x
+	_game_content.position.y = viewport_size.y * 0.5 - board_center_y
 
 
 func _unhandled_input(event: InputEvent) -> void:
@@ -120,7 +114,6 @@ func _begin_countdown(fresh_game: bool) -> void:
 	game_over_screen.hide()
 	game_board.show()
 	hud.show()
-	menu_button.visible = false
 
 	if fresh_game:
 		_background_layer.select_random()
@@ -139,7 +132,6 @@ func _begin_countdown(fresh_game: bool) -> void:
 
 func _on_countdown_finished() -> void:
 	current_state = State.PLAYING
-	menu_button.visible = true
 	game_board.set_process(true)
 	hud.set_process(true)
 	MusicManager.play()
@@ -152,7 +144,6 @@ func _on_countdown_finished() -> void:
 func _pause() -> void:
 	current_state = State.PAUSED
 	pause_menu.show()
-	menu_button.visible = false
 	game_board.set_process(false)
 	hud.set_process(false)
 	MusicManager.pause()
@@ -161,7 +152,6 @@ func _pause() -> void:
 func _resume() -> void:
 	current_state = State.PLAYING
 	pause_menu.hide()
-	menu_button.visible = true
 	game_board.set_process(true)
 	hud.set_process(true)
 	MusicManager.unpause()
@@ -173,7 +163,6 @@ func _resume() -> void:
 
 func on_game_over(final_score: int) -> void:
 	current_state = State.GAME_OVER
-	menu_button.visible = false
 	game_board.set_process(false)
 	hud.set_process(false)
 	final_score_label.text = "Score: " + str(final_score)
@@ -184,33 +173,59 @@ func on_game_over(final_score: int) -> void:
 
 func _build_stats_text() -> String:
 	var scoring: Scoring = game_board.game_logic.scoring
-	var panel_stats: Dictionary = game_board.get_left_panel_stats()
-	var combo_stats: Dictionary = panel_stats.get("combo_stats", {})
-	var b2b_total: int = panel_stats.get("b2b_total", 0)
+	var stats: Dictionary = scoring.get_end_stats()
 
-	var lines: Array[String] = []
-	lines.append("Level: " + str(scoring.level) + "  |  Lines: " + str(scoring.lines_cleared))
-	lines.append("")
+	var text_lines: Array[String] = []
+	text_lines.append("Level: " + str(scoring.level) + "  |  Lines: " + str(scoring.lines_cleared))
 
-	# Combo stats — ALL levels (sorted ascending), not just top 7
-	var levels: Array = combo_stats.keys()
+	# Clear type breakdown (only non-zero)
+	var clears: Array[String] = []
+	if stats["singles"] > 0: clears.append("Single: " + str(stats["singles"]))
+	if stats["doubles"] > 0: clears.append("Double: " + str(stats["doubles"]))
+	if stats["triples"] > 0: clears.append("Triple: " + str(stats["triples"]))
+	if stats["tetrises"] > 0: clears.append("Tetris: " + str(stats["tetrises"]))
+	if clears.size() > 0:
+		text_lines.append("")
+		for i in range(0, clears.size(), 2):
+			if i + 1 < clears.size():
+				text_lines.append(clears[i] + "   " + clears[i + 1])
+			else:
+				text_lines.append(clears[i])
+
+	# T-spin stats (only non-zero)
+	var tspins: Array[String] = []
+	if stats["tspin_singles"] > 0: tspins.append("TSS: " + str(stats["tspin_singles"]))
+	if stats["tspin_doubles"] > 0: tspins.append("TSD: " + str(stats["tspin_doubles"]))
+	if stats["tspin_triples"] > 0: tspins.append("TST: " + str(stats["tspin_triples"]))
+	if stats["tspin_mini_singles"] > 0: tspins.append("Mini: " + str(stats["tspin_mini_singles"]))
+	if tspins.size() > 0:
+		text_lines.append("")
+		text_lines.append("  ".join(tspins))
+
+	# Combo chains
+	var combo_chains: Dictionary = stats["combo_chains"]
+	var levels: Array = combo_chains.keys()
 	levels.sort()
 	if levels.size() > 0:
 		var combo_parts: Array[String] = []
 		for level in levels:
-			var count: int = combo_stats[level]
+			var count: int = combo_chains[level]
 			if count > 0:
 				combo_parts.append(str(count) + "x C" + str(level))
 		if combo_parts.size() > 0:
-			lines.append("-- Combos --")
-			lines.append("  ".join(combo_parts))
-			lines.append("")
+			text_lines.append("")
+			text_lines.append("  ".join(combo_parts))
 
-	# B2B total
-	if b2b_total > 0:
-		lines.append("Back-to-Back: " + str(b2b_total))
+	# Max combo, B2B, Perfect Clears
+	var footer: Array[String] = []
+	if stats["max_combo"] > 0: footer.append("Max Combo: " + str(stats["max_combo"]))
+	if stats["max_b2b"] > 0: footer.append("B2B: " + str(stats["max_b2b"]))
+	if stats["perfect_clears"] > 0: footer.append("PC: " + str(stats["perfect_clears"]))
+	if footer.size() > 0:
+		text_lines.append("")
+		text_lines.append("  |  ".join(footer))
 
-	return "\n".join(lines)
+	return "\n".join(text_lines)
 
 
 func _play_again() -> void:
@@ -227,7 +242,6 @@ func _quit_to_menu_from_pause() -> void:
 	pause_menu.hide()
 	game_board.hide()
 	hud.hide()
-	menu_button.visible = false
 	title_screen.show()
 	MusicManager.stop()
 
@@ -237,7 +251,6 @@ func _quit_to_menu_from_game_over() -> void:
 	game_over_screen.hide()
 	game_board.hide()
 	hud.hide()
-	menu_button.visible = false
 	title_screen.show()
 	MusicManager.stop()
 
@@ -247,7 +260,6 @@ func _show_title_screen() -> void:
 	title_screen.show()
 	game_board.hide()
 	hud.hide()
-	menu_button.visible = false
 	pause_menu.hide()
 	game_over_screen.hide()
 	credits_screen.hide()

@@ -5,7 +5,6 @@ const GameLogicScript = preload("res://scripts/game_logic.gd")
 const GridScript = preload("res://scripts/grid.gd")
 const BoardVfxScript = preload("res://scripts/board_vfx.gd")
 const FloatingTextRendererScript = preload("res://scripts/floating_text_renderer.gd")
-const LeftPanelDisplayScript = preload("res://scripts/left_panel_display.gd")
 const ParticleEffectsScript = preload("res://scripts/particle_effects.gd")
 
 var game_logic: GameLogicScript
@@ -15,7 +14,6 @@ var show_ghost: bool = true
 
 var _vfx: BoardVfxScript
 var _text_renderer: Node2D   # FloatingTextRenderer
-var _left_panel: Node2D   # LeftPanelDisplay (persistent counters)
 var _particles: Node2D        # ParticleEffects
 var _original_position: Vector2 = Vector2.ZERO
 
@@ -43,9 +41,6 @@ func _ready() -> void:
 	_text_renderer = FloatingTextRendererScript.new()
 	add_child(_text_renderer)
 
-	_left_panel = LeftPanelDisplayScript.new()
-	add_child(_left_panel)
-
 	_particles = ParticleEffectsScript.new()
 	add_child(_particles)
 
@@ -53,13 +48,8 @@ func _ready() -> void:
 	game_logic.start_game()
 
 
-func get_left_panel_stats() -> Dictionary:
-	return _left_panel.get_stats()
-
-
 func clear_floating_texts() -> void:
 	_text_renderer.clear()
-	_left_panel.clear()
 	_vfx.reset()
 	position = _original_position
 	_particles.force_clear()
@@ -140,21 +130,6 @@ func _process(delta: float) -> void:
 			_vfx.trigger_border_glow(events)
 			_particles.spawn_clear_particles(events)
 
-			# Update left panel persistent counters
-			var combo = events.get("combo_count", -1)
-			var b2b_count = events.get("back_to_back_count", 0)
-
-			if combo >= 1:
-				_left_panel.update_combo(combo)
-			elif combo == -1:
-				_left_panel.clear_combo()
-
-			if b2b_count > 0:
-				_left_panel.update_b2b(b2b_count)
-			elif b2b_count == 0:
-				# B2B broke on this line clear
-				_left_panel.clear_b2b()
-
 		if events.get("level_up", false):
 			SfxManager.play("level_up")
 			var center = _get_playfield_center()
@@ -177,49 +152,60 @@ func grid_to_screen(grid_pos: Vector2i) -> Vector2:
 	return Constants.BOARD_OFFSET + Vector2(grid_pos.x * Constants.CELL_SIZE, grid_pos.y * Constants.CELL_SIZE)
 
 
+func _buffer_alpha(row: int) -> float:
+	if row >= Constants.BUFFER_ROWS:
+		return 1.0
+	return float(row) / float(Constants.BUFFER_ROWS)
+
+
 func _draw() -> void:
 	if game_logic == null:
 		return
 
 	var board_w = Constants.COLS * Constants.CELL_SIZE
-	var board_h = Constants.TOTAL_ROWS * Constants.CELL_SIZE
+	var visible_top = Constants.BOARD_OFFSET.y + Constants.BUFFER_ROWS * Constants.CELL_SIZE
+	var visible_h = Constants.VISIBLE_ROWS * Constants.CELL_SIZE
 
-	var board_rect = Rect2(Constants.BOARD_OFFSET.x, Constants.BOARD_OFFSET.y, board_w, board_h)
+	var board_rect = Rect2(Constants.BOARD_OFFSET.x, visible_top, board_w, visible_h)
 
-	# Subtle grid lines — full board (all 24 rows)
-	var play_top = Constants.BOARD_OFFSET.y
-	var play_h = Constants.TOTAL_ROWS * Constants.CELL_SIZE
+	# Dark semi-transparent background behind playfield
+	draw_rect(board_rect, Color(0.07, 0.07, 0.11, 0.82), true)
+
+	# Subtle grid lines — visible 20 rows only
 	for i in range(1, Constants.COLS):
 		var x = Constants.BOARD_OFFSET.x + i * Constants.CELL_SIZE
-		draw_line(Vector2(x, play_top), Vector2(x, play_top + play_h), Constants.GRID_LINE_COLOR)
-	for j in range(1, Constants.TOTAL_ROWS):
-		var y = play_top + j * Constants.CELL_SIZE
+		draw_line(Vector2(x, visible_top), Vector2(x, visible_top + visible_h), Constants.GRID_LINE_COLOR)
+	for j in range(1, Constants.VISIBLE_ROWS):
+		var y = visible_top + j * Constants.CELL_SIZE
 		draw_line(Vector2(Constants.BOARD_OFFSET.x, y), Vector2(Constants.BOARD_OFFSET.x + board_w, y), Constants.GRID_LINE_COLOR)
 
-	# Thin white border around entire board area (all 24 rows)
+	# Thin white border around visible play area (20 rows)
 	draw_rect(board_rect, Constants.BORDER_COLOR, false, Constants.BORDER_WIDTH)
 
 	# Border glow (drawn on top of normal border)
 	_draw_border_glow()
 
-	# Draw locked blocks — ALL rows (including spawn zone)
+	# Draw locked blocks — ALL rows (including spawn zone with fade)
 	# Skip rows that are currently being animated (clear animation draws them separately)
 	var clearing_rows = _vfx.get_clearing_rows()
 	var grid = game_logic.grid
 	for y in range(grid.HEIGHT):
 		if y in clearing_rows:
 			continue
+		var alpha := _buffer_alpha(y)
+		if alpha <= 0.0:
+			continue
 		for x in range(grid.WIDTH):
 			var cell_value = grid.cells[y][x]
 			if cell_value != "":
 				var pos = grid_to_screen(Vector2i(x, y))
 				if textures.has(cell_value):
-					draw_texture(textures[cell_value], pos)
+					draw_texture(textures[cell_value], pos, Color(1.0, 1.0, 1.0, alpha))
 
 	# Draw clear animation overlays (flash / dissolve)
 	_draw_clear_animations()
 
-	# Ghost piece — visible from row 0
+	# Ghost piece — visible rows only
 	var active_positions: Array[Vector2i] = []
 	if game_logic.active_piece != null:
 		active_positions = game_logic.active_piece.get_block_positions()
@@ -228,11 +214,11 @@ func _draw() -> void:
 	if show_ghost:
 		var ghost_positions = game_logic.get_ghost_blocks()
 		for ghost_pos in ghost_positions:
-			if ghost_pos.y >= 0 and not ghost_pos in active_positions:
+			if ghost_pos.y >= Constants.BUFFER_ROWS and not ghost_pos in active_positions:
 				var pos = grid_to_screen(ghost_pos)
 				draw_texture(textures["ghost"], pos)
 
-	# Active piece with glow — brighter than locked blocks
+	# Active piece with glow — fade in through buffer zone
 	if game_logic.active_piece != null:
 		var piece_type = game_logic.active_piece.type
 		if textures.has(piece_type):
@@ -240,11 +226,14 @@ func _draw() -> void:
 				_draw_hard_drop_starfall(active_positions, hard_drop_state)
 			for active_pos in active_positions:
 				if active_pos.y >= 0:
+					var alpha := _buffer_alpha(active_pos.y)
+					if alpha <= 0.0:
+						continue
 					var pos = grid_to_screen(active_pos)
-					draw_texture(textures[piece_type], pos)
-					var glow_alpha := 0.2
+					draw_texture(textures[piece_type], pos, Color(1.0, 1.0, 1.0, alpha))
+					var glow_alpha := 0.2 * alpha
 					if hard_drop_state.get("active", false):
-						glow_alpha = 0.45
+						glow_alpha = 0.45 * alpha
 					var glow_color = Color(1.0, 1.0, 1.0, glow_alpha)
 					draw_texture(textures[piece_type], pos, glow_color)
 
@@ -258,7 +247,8 @@ func _draw_border_glow() -> void:
 		return
 
 	var board_w = Constants.COLS * Constants.CELL_SIZE
-	var board_h = Constants.TOTAL_ROWS * Constants.CELL_SIZE
+	var visible_top = Constants.BOARD_OFFSET.y + Constants.BUFFER_ROWS * Constants.CELL_SIZE
+	var visible_h = Constants.VISIBLE_ROWS * Constants.CELL_SIZE
 
 	for i in range(4):
 		var expand = float(i) * 2.0
@@ -269,9 +259,9 @@ func _draw_border_glow() -> void:
 		glow_color.a = alpha * 0.6
 		var glow_rect = Rect2(
 			Constants.BOARD_OFFSET.x - expand,
-			Constants.BOARD_OFFSET.y - expand,
+			visible_top - expand,
 			board_w + expand * 2.0,
-			board_h + expand * 2.0
+			visible_h + expand * 2.0
 		)
 		draw_rect(glow_rect, glow_color, false, 1.5 + float(i) * 0.5)
 

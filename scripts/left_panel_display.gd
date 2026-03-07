@@ -1,14 +1,26 @@
-extends Node2D
+extends Control
 
-## Renders persistent combo and B2B counters on the left panel.
-## Counters remain visible while active, no fade-out animation.
-## Added as a child of GameBoard — inherits shake transform automatically.
+## Renders persistent combo/special stats and B2B counter on the LeftScore HUD panel.
+## Reads directly from game_logic.scoring each frame.
+## - Special actions (TETRIS, T-SPINS, PERFECT CLEAR) have the LARGEST font.
+## - Combo streak shows "Combo x <SUM>" at the top.
 
 const Constants = preload("res://scripts/constants.gd")
 
-var _combo_count: int = -1  # -1 = no combo, 0+ = active combo
-var _b2b_count: int = 0     # 0 = no B2B, 1+ = active B2B
+var game_logic = null
+
+var _total_combos: int = 0
+var _special_stats: Dictionary = {} # {action_label: count}
+var _b2b_count: int = 0            # Current active B2B streak
 var _font_bold: Font
+
+# Custom font sizes for hierarchy
+const SPECIAL_FONT_SIZE: int = 42
+const COMBO_SUM_FONT_SIZE: int = 32
+const B2B_FONT_SIZE: int = 42
+
+# Width for right-aligned text (extending left from the board edge)
+const DRAW_WIDTH: float = 200.0
 
 
 func _ready() -> void:
@@ -22,32 +34,39 @@ func _ready() -> void:
 
 
 # =============================================================================
+# DATA POLLING
+# =============================================================================
+
+func _process(_delta: float) -> void:
+	if game_logic == null:
+		return
+
+	var scoring = game_logic.scoring
+	var changed := false
+
+	if _total_combos != scoring.stat_total_combos:
+		_total_combos = scoring.stat_total_combos
+		changed = true
+	if _b2b_count != scoring.stat_max_b2b:
+		_b2b_count = scoring.stat_max_b2b
+		changed = true
+	if scoring.stat_special_counts != _special_stats:
+		_special_stats = scoring.stat_special_counts.duplicate()
+		changed = true
+
+	if changed:
+		queue_redraw()
+
+
+# =============================================================================
 # PUBLIC API
 # =============================================================================
 
-func update_combo(count: int) -> void:
-	_combo_count = count
-	queue_redraw()
-
-
-func update_b2b(count: int) -> void:
-	_b2b_count = count
-	queue_redraw()
-
-
-func clear_combo() -> void:
-	_combo_count = -1
-	queue_redraw()
-
-
-func clear_b2b() -> void:
+func clear() -> void:
+	_total_combos = 0
+	_special_stats.clear()
 	_b2b_count = 0
 	queue_redraw()
-
-
-func clear() -> void:
-	clear_combo()
-	clear_b2b()
 
 
 # =============================================================================
@@ -55,22 +74,43 @@ func clear() -> void:
 # =============================================================================
 
 func _draw() -> void:
+	# Right-align text to the board edge (with small gap)
+	# We use a large DRAW_WIDTH to prevent truncation, extending leftwards.
+	var x_pos = Constants.LEFT_PANEL_X_RIGHT - DRAW_WIDTH
 	var y = Constants.LEFT_PANEL_Y_START
 	
-	# B2B counter (if active)
-	if _b2b_count > 0:
-		draw_string(_font_bold, Vector2(0, y), "B2B x" + str(_b2b_count),
-			HORIZONTAL_ALIGNMENT_RIGHT, Constants.LEFT_PANEL_X_RIGHT, 
-			Constants.LEFT_PANEL_B2B_FONT_SIZE, Color(1.0, 0.85, 0.0))
-		y += Constants.LEFT_PANEL_B2B_FONT_SIZE + Constants.LEFT_PANEL_LINE_GAP
+	# 1. Total Combo Sum (at the top: "Combo x <SUM>")
+	if _total_combos > 0:
+		var combo_text = "Combo x " + str(_total_combos)
+		draw_string(_font_bold, Vector2(x_pos, y), combo_text,
+			HORIZONTAL_ALIGNMENT_RIGHT, DRAW_WIDTH,
+			COMBO_SUM_FONT_SIZE, Color(1.0, 1.0, 0.3))
+		y += COMBO_SUM_FONT_SIZE + Constants.LEFT_PANEL_LINE_GAP
 	
-	# Combo counter (if active: combo 1+ displays as "2 COMBO", "3 COMBO"...)
-	if _combo_count >= 1:
-		var combo_text = str(_combo_count + 1) + " COMBO"
-		var combo_color = _get_combo_color(_combo_count)
-		draw_string(_font_bold, Vector2(0, y), combo_text,
-			HORIZONTAL_ALIGNMENT_RIGHT, Constants.LEFT_PANEL_X_RIGHT,
-			Constants.LEFT_PANEL_COMBO_FONT_SIZE, combo_color)
+	# 2. B2B current streak (if active)
+	if _b2b_count > 0:
+		draw_string(_font_bold, Vector2(x_pos, y), "B2B x" + str(_b2b_count),
+			HORIZONTAL_ALIGNMENT_RIGHT, DRAW_WIDTH, 
+			B2B_FONT_SIZE, Color(1.0, 0.85, 0.0))
+		y += B2B_FONT_SIZE + Constants.LEFT_PANEL_LINE_GAP
+	
+	# 3. Special Action counts (ALWAYS show, LARGEST font)
+	if not _special_stats.is_empty():
+		var special_labels = _special_stats.keys()
+		special_labels.sort() # Alphabetical
+		
+		for label in special_labels:
+			var count = _special_stats[label]
+			var text = label + " x " + str(count)
+			
+			var color = Color(1.0, 0.6, 0.1) # Golden/Orange
+			if label == "PERFECT CLEAR":
+				color = Color(1.0, 1.0, 1.0) # White
+			
+			draw_string(_font_bold, Vector2(x_pos, y), text,
+				HORIZONTAL_ALIGNMENT_RIGHT, DRAW_WIDTH,
+				SPECIAL_FONT_SIZE, color)
+			y += SPECIAL_FONT_SIZE + Constants.LEFT_PANEL_LINE_GAP
 
 
 # =============================================================================

@@ -3,10 +3,10 @@
 [ext_resource type="Script" uid="uid://dxypm4mxeq2nv" path="res://scripts/game_manager.gd" id="1_manager"]
 [ext_resource type="PackedScene" uid="uid://c27q8cl6l0acw" path="res://scenes/game_board.tscn" id="2_board"]
 [ext_resource type="PackedScene" uid="uid://34dap23k4cd3" path="res://scenes/hud.tscn" id="3_ui"]
-[ext_resource type="PackedScene" path="res://scenes/title_screen.tscn" id="4_menu"]
-[ext_resource type="PackedScene" path="res://scenes/pause_menu.tscn" id="5_pause"]
+[ext_resource type="PackedScene" uid="uid://blnt2wri44n1j" path="res://scenes/title_screen.tscn" id="4_menu"]
+[ext_resource type="PackedScene" uid="uid://bb1pqej2aeu60" path="res://scenes/pause_menu.tscn" id="5_pause"]
 [ext_resource type="PackedScene" path="res://scenes/game_over_screen.tscn" id="6_gameover"]
-[ext_resource type="Script" path="res://scripts/background_manager.gd" id="7_bg_manager"]
+[ext_resource type="Script" uid="uid://djaa4nejxcoap" path="res://scripts/background_manager.gd" id="7_bg_manager"]
 [ext_resource type="PackedScene" path="res://scenes/credits_screen.tscn" id="8_credits"]
 
 [sub_resource type="CanvasItemMaterial" id="CanvasItemMaterial_cg"]
@@ -33,7 +33,7 @@ visible = false
 [node name="GameOverScreen" parent="." unique_id=1576333213 instance=ExtResource("6_gameover")]
 visible = false
 
-[node name="CreditsScreen" parent="." instance=ExtResource("8_credits")]
+[node name="CreditsScreen" parent="." unique_id=1508278618 instance=ExtResource("8_credits")]
 visible = false
 
 [node name="ColorGrading" type="CanvasLayer" parent="." unique_id=1158274193]

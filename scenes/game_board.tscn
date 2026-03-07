@@ -4,11 +4,3 @@
 
 [node name="GameBoard" type="Node2D" unique_id=1824419118]
 script = ExtResource("1_gb")
-
-[node name="BoardBG" type="ColorRect" parent="." unique_id=382723258]
-show_behind_parent = true
-offset_left = 80.0
-offset_top = 86.0
-offset_right = 400.0
-offset_bottom = 854.0
-color = Color(0.07, 0.07, 0.11, 0.82)

@@ -14,7 +14,7 @@ const BUFFER_ROWS: int = 4
 # BOARD LAYOUT
 # =============================================================================
 const DESIGN_WIDTH: int = 480
-const BOARD_OFFSET := Vector2(80, 86)  # (480 - 320) / 2 = 80, aligned with panels
+const BOARD_OFFSET := Vector2(80, -42)  # Buffer rows above visible area; visible top = -42 + 4*32 = 86
 
 # =============================================================================
 # VISUAL STYLE

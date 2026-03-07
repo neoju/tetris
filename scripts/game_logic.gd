@@ -355,6 +355,17 @@ func _lock_piece() -> Dictionary:
 	events["locked_piece_type"] = active_piece.type
 
 	grid.place_blocks(lock_positions, active_piece.type)
+
+	# Game over if any block locked above the visible grid
+	for pos in lock_positions:
+		if pos.y < Constants.BUFFER_ROWS:
+			game_active = false
+			events["piece_locked"] = true
+			events["locked_positions"] = lock_positions
+			events["locked_piece_type"] = active_piece.type
+			active_piece = null
+			return events
+
 	var tspin := scoring.detect_tspin(
 		grid,
 		active_piece.type,

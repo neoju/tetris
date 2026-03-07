@@ -74,6 +74,7 @@ func test_hard_drop_scores_correctly() -> void:
 
 func test_soft_drop_scoring_on_lock() -> void:
 	var score_before = _game.scoring.score
+	_game.active_piece.position.y += 4
 	_game.soft_drop_distance = 6
 
 	var lock_events = _game._lock_piece()
