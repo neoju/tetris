@@ -13,15 +13,15 @@ OUTPUT_DIR = os.path.join(os.path.dirname(__file__), "..", "assets", "blocks")
 # Block size
 BLOCK_SIZE = 32
 
-# Color definitions (lighter than standard)
+# Color definitions (balanced brightness)
 COLORS = {
-    "cyan": "#40D0D0",  # I-piece
-    "blue": "#4040FF",  # J-piece
-    "orange": "#FFB84D",  # L-piece
-    "yellow": "#FFFF4D",  # O-piece
-    "green": "#40FF40",  # S-piece
-    "purple": "#A040A0",  # T-piece
-    "red": "#FF4040",  # Z-piece
+    "cyan": "#20C0C0",  # I-piece
+    "blue": "#2020E0",  # J-piece
+    "orange": "#E09020",  # L-piece
+    "yellow": "#E0E020",  # O-piece
+    "green": "#20E020",  # S-piece
+    "purple": "#802080",  # T-piece
+    "red": "#E02020",  # Z-piece
 }
 
 
