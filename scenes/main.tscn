@@ -8,6 +8,7 @@
 [ext_resource type="PackedScene" path="res://scenes/game_over_screen.tscn" id="6_gameover"]
 [ext_resource type="Script" uid="uid://djaa4nejxcoap" path="res://scripts/background_manager.gd" id="7_bg_manager"]
 [ext_resource type="PackedScene" path="res://scenes/credits_screen.tscn" id="8_credits"]
+[ext_resource type="PackedScene" path="res://scenes/confirm_dialog.tscn" id="9_confirm"]
 
 [sub_resource type="CanvasItemMaterial" id="CanvasItemMaterial_cg"]
 blend_mode = 3
@@ -17,6 +18,18 @@ script = ExtResource("1_manager")
 
 [node name="BackgroundLayer" type="CanvasLayer" parent="." unique_id=940960295]
 script = ExtResource("7_bg_manager")
+
+[node name="GameOverlay" type="CanvasLayer" parent="."]
+layer = 0
+
+[node name="Overlay" type="ColorRect" parent="GameOverlay"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0, 0, 0, 0.05)
 
 [node name="GameContent" type="Node2D" parent="." unique_id=1234567890]
 
@@ -28,6 +41,9 @@ script = ExtResource("7_bg_manager")
 visible = false
 
 [node name="PauseMenu" parent="." unique_id=1546555336 instance=ExtResource("5_pause")]
+visible = false
+
+[node name="ConfirmDialog" parent="." instance=ExtResource("9_confirm")]
 visible = false
 
 [node name="GameOverScreen" parent="." unique_id=1576333213 instance=ExtResource("6_gameover")]

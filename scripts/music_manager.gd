@@ -25,7 +25,6 @@ func _ready() -> void:
 	_player.volume_db = Constants.MUSIC_VOLUME_DB
 	_player.bus = "Master"
 	add_child(_player)
-	_player.finished.connect(_on_track_finished)
 
 
 # =============================================================================
@@ -67,12 +66,3 @@ func toggle() -> bool:
 		else:
 			play()
 	return enabled
-
-
-# =============================================================================
-# LOOPING
-# =============================================================================
-
-func _on_track_finished() -> void:
-	if enabled and not _player.stream_paused:
-		play()

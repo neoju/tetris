@@ -73,12 +73,10 @@ const MUSIC_VOLUME_DB: float = -12.0
 # LEFT PANEL DISPLAY
 # =============================================================================
 const LEFT_PANEL_X_RIGHT: float = 72.0
-const LEFT_PANEL_Y_START: float = 250.0
-const LEFT_PANEL_HOLD_DURATION: float = 0.5
-const LEFT_PANEL_FADE_DURATION: float = 1.5
-const LEFT_PANEL_TOTAL_DURATION: float = 2.0
-const LEFT_PANEL_TEXT_WIDTH: float = 72.0
-const LEFT_PANEL_ACTION_FONT_SIZE: int = 28
-const LEFT_PANEL_COMBO_FONT_SIZE: int = 36
-const LEFT_PANEL_B2B_FONT_SIZE: int = 20
-const LEFT_PANEL_LINE_GAP: float = 6.0
+const LEFT_PANEL_Y_START: float = 240.0
+const LEFT_PANEL_DRAW_WIDTH: float = 220.0
+const LEFT_PANEL_LINE_GAP: float = 10.0
+# Font hierarchy: specials (largest) > B2B > combo (smallest)
+const LEFT_PANEL_SPECIAL_FONT_SIZE: int = 26
+const LEFT_PANEL_B2B_FONT_SIZE: int = 24
+const LEFT_PANEL_COMBO_FONT_SIZE: int = 20

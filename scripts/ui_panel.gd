@@ -1,8 +1,8 @@
 extends Control
 
 @onready var score_value: Label = $RightScore/ScoreValue
-@onready var level_value: Label = $LeftScore/LevelValue
-@onready var lines_value: Label = $LeftScore/LinesValue
+@onready var lines_value: Label = $RightScore/LinesValue
+@onready var level_value: Label = $RightScore/LevelValue
 @onready var hold_display: Control = $HoldContainer/HoldPiece
 @onready var next_display: Control = $NextContainer/NextPieces
 @onready var left_panel: Control = $LeftScore
@@ -23,8 +23,8 @@ func _process(_delta: float) -> void:
 		return
 
 	score_value.text = _format_number(game_logic.scoring.score)
-	level_value.text = str(game_logic.scoring.level)
-	lines_value.text = str(game_logic.scoring.lines_cleared)
+	lines_value.text = "LINES %4d" % game_logic.scoring.lines_cleared
+	level_value.text = "LEVEL %4d" % game_logic.scoring.level
 
 
 func _format_number(n: int) -> String:

@@ -13,14 +13,17 @@ var title_screen: Control
 var pause_menu: CanvasLayer
 var game_over_screen: CanvasLayer
 var credits_screen: Control
+var confirm_dialog: CanvasLayer
 var final_score_label: Label
 var stats_label: Label
+var confirm_message_label: Label
 var sfx_toggle: TextureButton
 var music_toggle: TextureButton
 var ghost_toggle: TextureButton
 
 var _game_content: Node2D
 var _background_layer: CanvasLayer
+var _pending_confirm_action: Callable
 
 
 func _ready() -> void:
@@ -32,6 +35,7 @@ func _ready() -> void:
 	pause_menu = $PauseMenu
 	game_over_screen = $GameOverScreen
 	credits_screen = $CreditsScreen
+	confirm_dialog = $ConfirmDialog
 
 	game_board.game_manager = self
 
@@ -57,7 +61,16 @@ func _ready() -> void:
 	resume_btn.pressed.connect(_resume)
 
 	var quit_to_menu_btn = pause_menu.get_node("Control/CenterContainer/PanelContainer/VBoxContainer/QuitButton")
-	quit_to_menu_btn.pressed.connect(_quit_to_menu_from_pause)
+	quit_to_menu_btn.pressed.connect(_on_quit_to_menu_pressed)
+
+	var restart_btn = pause_menu.get_node("Control/CenterContainer/PanelContainer/VBoxContainer/RestartButton")
+	restart_btn.pressed.connect(_on_restart_pressed)
+
+	confirm_message_label = confirm_dialog.get_node("Control/CenterContainer/PanelContainer/VBoxContainer/MessageLabel")
+	var yes_btn = confirm_dialog.get_node("Control/CenterContainer/PanelContainer/VBoxContainer/ButtonRow/YesButton")
+	yes_btn.pressed.connect(_on_confirm_yes)
+	var no_btn = confirm_dialog.get_node("Control/CenterContainer/PanelContainer/VBoxContainer/ButtonRow/NoButton")
+	no_btn.pressed.connect(_on_confirm_no)
 
 	var play_again_btn = game_over_screen.get_node("Control/CenterContainer/PanelContainer/VBoxContainer/PlayAgainButton")
 	play_again_btn.pressed.connect(_play_again)
@@ -94,7 +107,9 @@ func _on_viewport_resized() -> void:
 
 func _unhandled_input(event: InputEvent) -> void:
 	if event.is_action_pressed("pause"):
-		if current_state == State.PLAYING:
+		if confirm_dialog.visible:
+			_on_confirm_no()
+		elif current_state == State.PLAYING:
 			_pause()
 		elif current_state == State.PAUSED:
 			_resume()
@@ -234,6 +249,41 @@ func _play_again() -> void:
 
 
 # =============================================================================
+# CONFIRM DIALOG
+# =============================================================================
+
+func _show_confirm(message: String, action: Callable) -> void:
+	confirm_message_label.text = message
+	_pending_confirm_action = action
+	confirm_dialog.show()
+
+
+func _on_confirm_yes() -> void:
+	confirm_dialog.hide()
+	if _pending_confirm_action.is_valid():
+		_pending_confirm_action.call()
+	_pending_confirm_action = Callable()
+
+
+func _on_confirm_no() -> void:
+	confirm_dialog.hide()
+	_pending_confirm_action = Callable()
+
+
+func _on_restart_pressed() -> void:
+	_show_confirm("Restart game?", _restart_game)
+
+
+func _on_quit_to_menu_pressed() -> void:
+	_show_confirm("Quit to menu?", _quit_to_menu_from_pause)
+
+
+func _restart_game() -> void:
+	pause_menu.hide()
+	_begin_countdown(true)
+
+
+# =============================================================================
 # MENU NAVIGATION
 # =============================================================================
 
@@ -263,6 +313,7 @@ func _show_title_screen() -> void:
 	pause_menu.hide()
 	game_over_screen.hide()
 	credits_screen.hide()
+	confirm_dialog.hide()
 	game_board.set_process(false)
 	hud.set_process(false)
 

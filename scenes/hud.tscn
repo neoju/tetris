@@ -1,9 +1,9 @@
 [gd_scene format=3 uid="uid://34dap23k4cd3"]
 
 [ext_resource type="Script" uid="uid://bbp6ux3gi11t1" path="res://scripts/ui_panel.gd" id="1_abc"]
-[ext_resource type="Script" path="res://scripts/hold_display.gd" id="4_hold"]
-[ext_resource type="Script" path="res://scripts/next_display.gd" id="5_next"]
 [ext_resource type="Script" uid="uid://cogyrhe8lg6q4" path="res://scripts/left_panel_display.gd" id="3_left_panel"]
+[ext_resource type="Script" uid="uid://dqu1xyfomnkhh" path="res://scripts/hold_display.gd" id="4_hold"]
+[ext_resource type="Script" uid="uid://ldeil3vdeqs1" path="res://scripts/next_display.gd" id="5_next"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_panel"]
 bg_color = Color(0.07, 0.07, 0.11, 0.8)
@@ -56,8 +56,8 @@ text = "HOLD"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="HoldPiece" type="Control" parent="HoldContainer"]
-layout_mode = 0
+[node name="HoldPiece" type="Control" parent="HoldContainer" unique_id=432029723]
+anchors_preset = 0
 offset_right = 108.0
 offset_bottom = 96.0
 mouse_filter = 2
@@ -94,8 +94,8 @@ text = "NEXT"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="NextPieces" type="Control" parent="NextContainer"]
-layout_mode = 0
+[node name="NextPieces" type="Control" parent="NextContainer" unique_id=1430075749]
+anchors_preset = 0
 offset_right = 108.0
 offset_bottom = 260.0
 mouse_filter = 2
@@ -105,29 +105,60 @@ script = ExtResource("5_next")
 layout_mode = 1
 anchors_preset = 0
 offset_left = 408.0
-offset_top = 474.0
+offset_top = 359.0
 offset_right = 568.0
-offset_bottom = 530.0
+offset_bottom = 504.0
 
 [node name="ScoreLabel" type="Label" parent="RightScore" unique_id=305111883]
 layout_mode = 0
-offset_right = 45.0
+offset_right = 160.0
 offset_bottom = 19.0
-theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_color = Color(0.75, 0.75, 0.85, 1)
+theme_override_colors/font_shadow_color = Color(0, 0, 0.05, 0.55)
+theme_override_constants/shadow_offset_x = 1
+theme_override_constants/shadow_offset_y = 2
 theme_override_font_sizes/font_size = 24
 text = "SCORE"
-horizontal_alignment = 1
 vertical_alignment = 1
 
 [node name="ScoreValue" type="Label" parent="RightScore" unique_id=6771264]
 layout_mode = 0
-offset_top = 16.0
-offset_right = 18.0
-offset_bottom = 54.0
+offset_top = 20.0
+offset_right = 160.0
+offset_bottom = 58.0
 theme_override_colors/font_color = Color(1, 1, 1, 1)
-theme_override_font_sizes/font_size = 48
+theme_override_colors/font_shadow_color = Color(0, 0, 0.05, 0.55)
+theme_override_constants/shadow_offset_x = 1
+theme_override_constants/shadow_offset_y = 2
+theme_override_font_sizes/font_size = 40
 text = "0"
-vertical_alignment = 2
+vertical_alignment = 1
+
+[node name="LinesValue" type="Label" parent="RightScore" unique_id=1606084962]
+layout_mode = 0
+offset_top = 78.0
+offset_right = 160.0
+offset_bottom = 98.0
+theme_override_colors/font_color = Color(0.85, 0.85, 0.95, 1)
+theme_override_colors/font_shadow_color = Color(0, 0, 0.05, 0.55)
+theme_override_constants/shadow_offset_x = 1
+theme_override_constants/shadow_offset_y = 2
+theme_override_font_sizes/font_size = 20
+text = "LINES    0"
+vertical_alignment = 1
+
+[node name="LevelValue" type="Label" parent="RightScore" unique_id=546820362]
+layout_mode = 0
+offset_top = 102.0
+offset_right = 160.0
+offset_bottom = 122.0
+theme_override_colors/font_color = Color(0.85, 0.85, 0.95, 1)
+theme_override_colors/font_shadow_color = Color(0, 0, 0.05, 0.55)
+theme_override_constants/shadow_offset_x = 1
+theme_override_constants/shadow_offset_y = 2
+theme_override_font_sizes/font_size = 20
+text = "LEVEL    1"
+vertical_alignment = 1
 
 [node name="LeftScore" type="Control" parent="." unique_id=172808747]
 layout_direction = 2
@@ -136,51 +167,3 @@ offset_top = 8.0
 offset_right = 80.0
 offset_bottom = 758.0
 script = ExtResource("3_left_panel")
-
-[node name="LevelLabel" type="Label" parent="LeftScore" unique_id=1138883398]
-layout_mode = 0
-offset_left = 3.0
-offset_top = 703.0
-offset_right = 44.0
-offset_bottom = 721.0
-theme_override_colors/font_color = Color(1, 1, 1, 1)
-theme_override_font_sizes/font_size = 22
-text = "LEVEL"
-horizontal_alignment = 1
-vertical_alignment = 1
-
-[node name="LevelValue" type="Label" parent="LeftScore" unique_id=1859627967]
-layout_mode = 0
-offset_left = 46.0
-offset_top = 699.0
-offset_right = 77.0
-offset_bottom = 722.0
-theme_override_colors/font_color = Color(1, 1, 1, 1)
-theme_override_font_sizes/font_size = 28
-text = "1"
-horizontal_alignment = 2
-vertical_alignment = 1
-
-[node name="LinesLabel" type="Label" parent="LeftScore" unique_id=902265708]
-layout_mode = 0
-offset_left = 3.0
-offset_top = 681.0
-offset_right = 44.0
-offset_bottom = 699.0
-theme_override_colors/font_color = Color(1, 1, 1, 1)
-theme_override_font_sizes/font_size = 22
-text = "LINES"
-horizontal_alignment = 1
-vertical_alignment = 1
-
-[node name="LinesValue" type="Label" parent="LeftScore" unique_id=330077406]
-layout_mode = 0
-offset_left = 46.0
-offset_top = 678.0
-offset_right = 77.0
-offset_bottom = 701.0
-theme_override_colors/font_color = Color(1, 1, 1, 1)
-theme_override_font_sizes/font_size = 28
-text = "0"
-horizontal_alignment = 2
-vertical_alignment = 1
