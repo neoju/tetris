@@ -7,12 +7,9 @@ const SHADER_PATH: String = "res://assets/shaders/parallax_layer.gdshader"
 # because imported .png files are not listed in PCK directory listings.
 # Key = set name, value = number of layers (files named 1.png, 2.png, ...).
 const SETS: Dictionary = {
-	"city_01": 7, "city_02": 8, "city_03": 7, "city_04": 8,
-	"city_05": 7, "city_06": 8, "city_07": 7, "city_08": 7,
-	"clouds_01": 4, "clouds_02": 4, "clouds_03": 4, "clouds_04": 4,
-	"clouds_05": 5, "clouds_06": 6, "clouds_07": 4, "clouds_08": 6,
-	"mountain_01": 5, "mountain_02": 7, "mountain_03": 5, "mountain_04": 3,
-	"mountain_05": 4, "mountain_06": 5, "mountain_07": 3, "mountain_08": 3,
+	"city_01": 7, "city_02": 8, "city_03": 7,
+	"clouds_01": 4, "clouds_02": 4, "clouds_03": 4,
+	"mountain_01": 5, "mountain_02": 7, "mountain_03": 5,
 }
 
 var _layer_rects: Array[ColorRect] = []

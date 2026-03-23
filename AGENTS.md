@@ -79,6 +79,7 @@ project.godot → scenes/main.tscn → GameManager (state machine: MENU/COUNTDOW
 - Naming: snake_case functions/vars, PascalCase class_name, UPPER_SNAKE constants
 - Tabs for indentation (not spaces)
 - LF line endings (.gitattributes enforced)
+- Always use godot mcp to create godot entitiies (Nodes, Scenes, CanvasLayer)
 
 ## ANTI-PATTERNS (THIS PROJECT)
 - DO NOT add `class_name` to autoload scripts — causes "hides autoload singleton" error
